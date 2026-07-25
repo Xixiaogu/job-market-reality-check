@@ -1,601 +1,122 @@
 # Job Market Reality Check
 
-<p align="center">
+> An evidence-based AI skill for exploring career options, skill gaps, and learning priorities from job-posting data.
 
-An evidence-based AI skill for understanding career opportunities, skill gaps, and job-market fit through real-world job posting data.
+## About
 
-</p>
+**Job Market Reality Check** compares a user's background with a supplied job-posting dataset.
 
----
+It aims to answer three practical questions:
 
-## 1. Overview
+- What roles are realistic with my current background?
+- Which skills appear most often in relevant job postings?
+- What should I learn next?
 
-Job Market Reality Check is an open-source AI Skill designed to help students, early-career developers, and career explorers make more informed decisions based on real job-market evidence.
+The project is designed for students, new graduates, and early-career job seekers interested in data analysis, Python, machine learning, and related roles.
 
-Many people make career decisions based on:
+## Planned Workflow
 
-- General internet advice
-- Personal opinions
-- Social media trends
-- Individual success stories
-
-However, these sources often fail to answer practical questions:
-
-- What jobs can I realistically apply for with my current skills?
-- Which skills are actually demanded by companies?
-- What is the gap between my current ability and market requirements?
-- Which skills should I learn next to improve employability?
-- Are my expectations aligned with the actual job market?
-
-This project aims to transform career planning from a subjective decision into a data-driven analysis process.
-
-The core idea is:
-
-> **Do not guess your career path. Analyze where your current skills fit in the real job market.**
-
----
-
-# 2. Motivation
-
-For students and early-career developers, choosing a technical direction is often difficult.
-
-For example:
-
-A student may know:
-
-- Python
-- Basic machine learning
-- Data analysis
-- Deep learning frameworks
-
-But still does not know:
-
-- Whether they are closer to a data analyst or machine learning engineer;
-- Which additional skills are required;
-- Whether their current learning path matches industry demand;
-- What realistic entry-level opportunities exist.
-
-Traditional career advice often provides general recommendations:
-
-```
-Learn Python.
-Learn AI.
-Build projects.
-Improve your resume.
+```text
+User profile
+    +
+Job-posting dataset
+    ↓
+Data cleaning and normalization
+    ↓
+Job-category and skill extraction
+    ↓
+Role matching and skill-gap analysis
+    ↓
+Evidence-based report
 ```
 
-However, such advice lacks personalized evidence.
-
-Job Market Reality Check attempts to answer these questions by combining:
-
-```
-Personal Profile
-        +
-Job Market Data
-        +
-Skill Requirement Analysis
-        +
-Compatibility Evaluation
-        ↓
-Evidence-based Career Report
-```
-
----
-
-# 3. Project Goals
-
-The goal of this project is NOT to:
-
-- Predict employment outcomes;
-- Guarantee job offers;
-- Replace professional career consulting;
-- Automatically apply for jobs.
-
-Instead, it focuses on:
-
-## 3.1 Career Reality Assessment
-
-Understand:
-
-- Current suitable job categories;
-- Possible career directions;
-- Market demand level.
-
----
-
-## 3.2 Skill Gap Analysis
-
-Identify:
-
-- Existing strengths;
-- Missing skills;
-- High-value learning priorities.
-
----
-
-## 3.3 Evidence-Based Decision Making
-
-Provide recommendations supported by:
-
-- Job posting statistics;
-- Skill frequency analysis;
-- Compatibility evaluation.
-
----
-
-# 4. Core Workflow
-
-The system follows the workflow:
-
-```
-                User Profile
-
-        Education
-        Major
-        Skills
-        Projects
-        Experience
-              |
-              |
-              ↓
-
-          Job Dataset
-
-        Position
-        Salary
-        Location
-        Requirements
-        Skills
-              |
-              |
-              ↓
-
-      Data Processing Pipeline
-
-        Cleaning
-        Normalization
-        Skill Extraction
-        Classification
-              |
-              |
-              ↓
-
-       Career Reality Report
-
-        Suitable Roles
-        Skill Match
-        Skill Gap
-        Salary Range
-        Learning Roadmap
-```
-
----
-
-# 5. Main Features
-
-## 5.1 Job Market Analysis
-
-Analyze collected job posting data:
-
-### Basic Information
-
-- Job title
-- Company
-- Location
-- Salary
-- Education requirement
-- Experience requirement
-
-
-### Market Statistics
-
-Generate:
-
-- Job category distribution;
-- Geographic distribution;
-- Salary distribution;
-- Requirement frequency.
-
-
-Example:
-
-```
-Sample Analysis:
-
-Data Analyst Related Jobs
-
-Python:
-72%
-
-SQL:
-65%
-
-Excel:
-51%
-
-Power BI:
-38%
-```
-
----
-
-# 5.2 Skill Demand Analysis
-
-The system extracts technical skills from job descriptions.
-
-Supported categories:
-
-## Programming
-
-- Python
-- Java
-- C++
-- JavaScript
-
-
-## Data Analysis
-
-- pandas
-- NumPy
-- Excel
-- SQL
-- Tableau
-- Power BI
-
-
-## Machine Learning
-
-- Scikit-learn
-- PyTorch
-- TensorFlow
-- Deep Learning
-
-
-## Engineering
-
-- Linux
-- Git
-- Docker
-- Cloud Platform
-
----
-
-# 5.3 Personal Skill Matching
-
-The system compares:
-
-```
-User Capability
-
-        VS
-
-Job Requirements
-```
-
-Example:
-
-```
-User Profile:
-
-Python          ✓
-Pandas          ✓
-Scikit-learn    ✓
-SQL             △
-Docker          ✕
-
---------------------------------
-
-Analysis:
-
-High Compatibility:
-
-✓ Data Analyst Intern
-✓ Data Science Intern
-
-
-Medium Compatibility:
-
-△ Machine Learning Intern
-
-
-Main Skill Gaps:
-
+## Planned Features
+
+- Analyze job titles, cities, salaries, education, and experience requirements
+- Extract technical skills from job descriptions
+- Compare job requirements with a user profile
+- Identify realistic, stretch, and currently unsuitable roles
+- Rank missing skills by their frequency in relevant postings
+- Generate a Markdown career reality-check report
+- Optionally use fastai for a job-category classification baseline
+
+## Example Output
+
+```text
+Realistic roles
+- Data Analyst Intern
+- Data Operations Intern
+- Python Data Processing Intern
+
+Stretch roles
+- Machine Learning Intern
+
+Common skill gaps
 1. SQL
 2. Linux
-3. Docker
+3. PyTorch
+
+Evidence
+- Results based on the supplied job-posting sample
+- Salary figures refer to advertised salary ranges
+- Findings do not represent the entire labor market
 ```
 
----
+## Project Structure
 
-# 5.4 Explainable Recommendations
-
-Instead of producing an unexplained score:
-
-```
-Match Score: 86%
-```
-
-the system emphasizes evidence:
-
-Example:
-
-```
-Recommendation:
-
-Data Analyst Intern
-
-Reasons:
-
-✓ Python requirement satisfied
-✓ Data processing experience available
-✓ Machine learning background is beneficial
-
-Missing:
-
-△ SQL
-△ Business intelligence tools
-```
-
----
-
-# 6. Design Principles
-
-## 6.1 Evidence Over Assumption
-
-All recommendations should be based on:
-
-- Available job posting data;
-- Clearly defined analysis rules;
-- Transparent methodology.
-
----
-
-## 6.2 Explainability Over Black-box Prediction
-
-The system prioritizes:
-
-```
-Why this recommendation?
-What evidence supports it?
-What should be improved?
-```
-
-rather than only producing numerical scores.
-
----
-
-## 6.3 Honest Limitations
-
-Career analysis contains uncertainty.
-
-Therefore:
-
-- Small datasets cannot represent the entire labor market;
-- Job advertisements may contain inaccurate salary information;
-- Keyword matching does not prove actual ability;
-- Recommendations are exploratory evidence, not guarantees.
-
----
-
-# 7. Project Structure
-
-Current planned structure:
-
-```
+```text
 job-market-reality-check/
-
 ├── SKILL.md
-│
 ├── README.md
-│
 ├── LICENSE
-│
 ├── references/
 │   ├── data_schema.md
-│   ├── skill_taxonomy.yml
-│   └── methodology.md
-│
+│   ├── methodology.md
+│   └── skill_taxonomy.yml
 ├── scripts/
-│   ├── salary_parser.py
-│   ├── skill_extractor.py
-│   └── report_generator.py
-│
 ├── assets/
-│
 └── examples/
-    └── demo/
 ```
 
----
+## Project Status
 
-# 8. Technology Stack
+The project is currently under development.
 
-Planned technologies:
+### v0.1
 
-## Data Processing
+- [x] Create the repository
+- [x] Define the project scope
+- [ ] Write the initial `SKILL.md`
+- [ ] Define the job-data schema
+- [ ] Create the skill taxonomy
+- [ ] Build a minimal working example
 
-- Python
-- pandas
-- NumPy
+### Later Versions
 
+- [ ] Salary normalization
+- [ ] Skill extraction
+- [ ] User-profile matching
+- [ ] Report generation
+- [ ] fastai classification baseline
+- [ ] Additional job datasets and regions
 
-## Visualization
+## Design Principles
 
-- Matplotlib
-- Plotly
+- Use evidence instead of generic career claims
+- Keep matching rules understandable
+- Separate dataset findings from broader market conclusions
+- Never invent job postings, salaries, or skill frequencies
+- Clearly report sample size, source, filters, and limitations
+- Do not bypass logins, CAPTCHAs, or website access restrictions
 
+## Limitations
 
-## Machine Learning
+The quality of the output depends on the supplied data.
 
-- Scikit-learn
+A small or biased sample cannot represent the entire job market. Advertised salaries may differ from actual compensation, and keyword matching cannot prove that a user has mastered a skill.
 
-Optional:
+The generated report should be treated as exploratory career evidence, not as a hiring prediction or employment guarantee.
 
-- fastai
-- PyTorch
+## License
 
-
-## AI Skill Framework
-
-- OpenAI Skill format
-- Markdown-based workflow definition
-
----
-
-# 9. Roadmap
-
-## Version 0.1 - Project Initialization
-
-Status:
-
-🚧 In Progress
-
-Tasks:
-
-- Define Skill specification;
-- Create project structure;
-- Define data schema;
-- Define skill taxonomy.
-
-
----
-
-## Version 0.2 - Job Market Analysis Pipeline
-
-Tasks:
-
-- Import job datasets;
-- Clean and normalize data;
-- Extract technical skills;
-- Generate market statistics.
-
-
----
-
-## Version 0.3 - Personal Matching Engine
-
-Tasks:
-
-- Create user profile format;
-- Implement skill matching;
-- Generate compatibility reports.
-
-
----
-
-## Version 0.4 - Machine Learning Enhancement
-
-Potential extensions:
-
-- Job category classification;
-- Semantic skill matching;
-- Embedding-based retrieval;
-- fastai baseline models.
-
-
----
-
-# 10. Example Use Cases
-
-## Case 1
-
-Input:
-
-```
-Bachelor student
-
-Skills:
-
-Python
-pandas
-machine learning basics
-
-Goal:
-
-Find suitable AI/data jobs
-```
-
-Output:
-
-```
-Recommended:
-
-Data Analyst Intern
-Data Science Intern
-
-Need improvement:
-
-SQL
-Visualization
-Deployment skills
-```
-
----
-
-## Case 2
-
-Input:
-
-```
-Current skills:
-
-Embedded systems
-C
-STM32
-
-Interested in AI transition
-```
-
-Output:
-
-```
-Possible transition paths:
-
-Embedded AI Engineer
-Edge AI Developer
-
-Recommended skills:
-
-Python
-PyTorch
-Computer Vision
-Linux
-```
-
----
-
-# 11. Future Extensions
-
-Possible future improvements:
-
-- Support different countries and regions;
-- Add industry-specific analysis;
-- Add semantic matching models;
-- Integrate vector retrieval;
-- Build interactive dashboards;
-- Create personalized learning plans.
-
----
-
-# 12. Disclaimer
-
-This project is an experimental open-source tool.
-
-It does not provide:
-
-- Employment guarantees;
-- Salary guarantees;
-- Professional career counseling.
-
-All recommendations should be interpreted according to:
-
-- Data source;
-- Sample size;
-- Analysis methodology;
-- Individual circumstances.
-
----
-
-# 13. License
-
-MIT License
+This project is licensed under the MIT License.
