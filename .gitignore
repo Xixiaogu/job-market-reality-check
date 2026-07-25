@@ -1,0 +1,32 @@
+﻿# Browser login/session profiles — never commit
+.chrome-human-profile/
+.playwright-profile/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local environment and secrets
+.env
+.env.*
+.venv/
+venv/
+
+# Raw and generated job data
+output/
+
+# Personal source files
+BOSS链接.xlsx
+~$*.xlsx
+
+# Environment package dumps
+base_science_conda_packages.txt
+base_science_pip_packages.txt
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
