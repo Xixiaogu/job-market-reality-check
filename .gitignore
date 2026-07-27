@@ -1,4 +1,4 @@
-﻿# Browser login/session profiles — never commit
+# Browser login/session profiles — never commit
 .chrome-human-profile/
 .playwright-profile/
 
@@ -30,3 +30,19 @@ base_science_pip_packages.txt
 *.tmp
 .DS_Store
 Thumbs.db
+
+# WXT / Node generated files
+node_modules/
+.wxt/
+.output/
+
+# Local project inspection report
+project_snapshot.txt
+
+# Local development backups
+local-backups/
+# Phase 6A local API runtime
+data/*.db
+data/*.db-*
+local_api/runtime/
+output/local_api/

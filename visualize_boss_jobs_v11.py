@@ -1,4 +1,7 @@
-﻿import base64
+from dashboard_ux_v12 import enhance_dashboard
+from dashboard_management_link_v13 import enhance_management_link
+
+import base64
 import html
 import json
 import re
@@ -441,6 +444,8 @@ def save_requirement_breakdown(
 def save_full_core_comparison(
     full_frequency: pd.DataFrame,
     core_frequency: pd.DataFrame,
+    full_count: int,
+    core_count: int,
 ) -> None:
     skills = (
         core_frequency.head(14)["技能"]
@@ -490,7 +495,7 @@ def save_full_core_comparison(
         y_position - bar_height / 2,
         frame["全样本"],
         height=bar_height,
-        label="全样本（23条）",
+        label=f"全样本（{full_count}条）",
         color=PALETTE[2],
     )
 
@@ -498,7 +503,7 @@ def save_full_core_comparison(
         y_position + bar_height / 2,
         frame["核心样本"],
         height=bar_height,
-        label="核心样本（22条）",
+        label=f"核心样本（{core_count}条）",
         color=PALETTE[1],
     )
 
@@ -880,11 +885,29 @@ def dataframe_html_table(
 
 
 def write_dashboard(
+    full_record_count: int,
     core_records: list[dict],
     frequency: pd.DataFrame,
     dashboard_dataframe: pd.DataFrame,
 ) -> None:
     total = len(core_records)
+    excluded_count = max(
+        full_record_count - total,
+        0,
+    )
+
+    if excluded_count:
+        sample_note = (
+            f"数据来自已经完成字段清洗和技能证据审计的 "
+            f"BOSS 收藏岗位。当前看板使用{total}条核心样本；"
+            f"{excluded_count}条记录保留在全样本中，"
+            "但不参与核心统计。"
+        )
+    else:
+        sample_note = (
+            f"数据来自已经完成字段清洗和技能证据审计的 "
+            f"BOSS 收藏岗位。当前看板使用{total}条核心样本。"
+        )
 
     internship_count = sum(
         record.get("employment_type")
@@ -1442,10 +1465,7 @@ def write_dashboard(
         <h1>个人收藏岗位可视化看板 v1.1</h1>
 
         <p class="subtitle">
-            数据来自已经完成字段清洗和技能证据审计的
-            BOSS 收藏岗位。当前看板使用22条核心样本；
-            1条带有疑似招聘文案编辑痕迹的记录仍保留在
-            全样本数据中，但不参与核心统计。
+            {html.escape(sample_note)}
         </p>
     </header>
 
@@ -1772,6 +1792,8 @@ def main() -> None:
     save_full_core_comparison(
         full_frequency,
         core_frequency,
+        len(records),
+        len(core_records),
     )
 
     save_skill_group_chart(
@@ -1913,10 +1935,14 @@ def main() -> None:
     )
 
     write_dashboard(
+        len(records),
         core_records,
         core_frequency,
         dashboard_dataframe,
     )
+
+    enhance_dashboard(DASHBOARD_FILE)
+    enhance_management_link(DASHBOARD_FILE)
 
     write_summary(
         core_records,
@@ -1954,3 +1980,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# PHASE_7B2_DASHBOARD_LINK
