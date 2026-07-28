@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import hmac
 from contextlib import asynccontextmanager
@@ -742,13 +742,26 @@ def get_decision_options(_: Protected) -> dict[str, Any]:
     return decision_options()
 
 
+# DECISION_REFRESH_V1
 @app.post("/api/v1/decision/recalculate")
 def recalculate_decision_scores(
     _: Protected,
     strategy: str = Query(default="balanced"),
+    pending_only: bool = Query(default=True),
+    limit: Annotated[int, Query(ge=1, le=500)] = 500,
 ) -> dict[str, Any]:
     try:
-        return recalculate_decisions(strategy=strategy)
+        result = recalculate_decisions(strategy=strategy)
+        return {
+            **result,
+            "summary": decision_summary(strategy=strategy),
+            "jobs": list_decisions(
+                strategy=strategy,
+                pending_only=pending_only,
+                limit=limit,
+            ),
+            "calibration": decision_calibration_report(strategy=strategy),
+        }
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

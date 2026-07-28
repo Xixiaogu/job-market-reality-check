@@ -1,3 +1,4 @@
+# DASHBOARD_AUTO_REFRESH_V1
 from __future__ import annotations
 
 import argparse
@@ -996,6 +997,7 @@ JS_TEMPLATE = r"""
     };
 
     const pageRunId = Number(PAGE_CONFIG.pipelineRunId ?? 0);
+    let autoRefreshScheduled = false;
 
     const shouldOfferRefresh = (latest) => {
         if (!latest || latest.status !== 'success') return false;
@@ -1028,8 +1030,18 @@ JS_TEMPLATE = r"""
             setPipelineStatus(health.latest_pipeline);
 
             if (shouldOfferRefresh(health.latest_pipeline)) {
-                updateMessage.textContent = `第 ${health.latest_pipeline.run_id} 次分析已经完成，发现新的看板结果。`;
+                const latestRunId = Number(health.latest_pipeline.run_id ?? 0);
+                updateMessage.textContent = `第 ${latestRunId} 次分析已经完成，正在自动载入最新看板。`;
                 updateBanner.classList.add('is-visible');
+                if (!autoRefreshScheduled) {
+                    autoRefreshScheduled = true;
+                    sessionStorage.setItem('job-dashboard-restore-scroll', String(window.scrollY));
+                    window.setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('_refresh', String(Date.now()));
+                        window.location.replace(url.toString());
+                    }, 700);
+                }
             } else {
                 updateBanner.classList.remove('is-visible');
             }

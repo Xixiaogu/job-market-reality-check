@@ -31,13 +31,13 @@ def enhance_management_link(path: Path) -> dict[str, Any]:
     )
     html = pattern.sub("", html)
 
-    if "</body>" not in html:
-        raise ValueError("Dashboard HTML is missing </body>.")
-
-    html = html.replace("</body>", BLOCK + "\n</body>", 1)
+    # The unified desktop shell now owns first-level navigation.
+    # Keep this compatibility step idempotent by removing the old floating
+    # "岗位管理中心" link instead of adding a second application-level entry.
     path.write_text(html, encoding="utf-8")
 
     return {
         "dashboard_path": str(path),
         "size_bytes": path.stat().st_size,
+        "management_link_removed": True,
     }

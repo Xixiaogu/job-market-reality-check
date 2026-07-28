@@ -11,7 +11,7 @@ from fastapi import Request
 from starlette.responses import Response
 
 
-SHELL_VERSION = "1.0.0"
+SHELL_VERSION = "1.1.0"
 SHELL_MARKER = 'id="jm-app-shell"'
 EXCLUDED_PATHS = {
     "/launch",
@@ -288,6 +288,91 @@ body.jm-unified-shell-body::before{
   backdrop-filter:blur(20px);
 }
 #jm-mobile-toggle svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+
+/* MARKET_DASHBOARD_INTEGRATION_V1 */
+#jm-market-layout{
+  display:grid;
+  grid-template-columns:190px minmax(0,1fr);
+  gap:16px;
+  align-items:start;
+  min-width:0;
+}
+#jm-market-content{min-width:0}
+body.jm-market-integrated #jm-app-main{padding:18px 18px 48px}
+body.jm-market-integrated #jm-market-layout #ux-sidebar{
+  position:sticky!important;
+  left:auto!important;
+  right:auto!important;
+  top:18px!important;
+  bottom:auto!important;
+  width:100%!important;
+  height:calc(100vh - 36px)!important;
+  min-height:480px;
+  transform:none!important;
+  z-index:35!important;
+  border-radius:18px!important;
+  box-shadow:0 16px 44px rgba(68,98,105,.10)!important;
+}
+body.jm-market-integrated #jm-market-layout .ux-sidebar-head{padding:17px 14px 13px}
+body.jm-market-integrated #jm-market-layout .ux-sidebar-kicker{font-size:9px}
+body.jm-market-integrated #jm-market-layout .ux-sidebar-title{font-size:17px}
+body.jm-market-integrated #jm-market-layout .ux-sidebar-summary{margin-top:7px}
+body.jm-market-integrated #jm-market-layout .ux-toc{padding:9px}
+body.jm-market-integrated #jm-market-layout .ux-toc-link{
+  gap:8px;
+  margin:2px 0;
+  padding:9px 9px;
+  font-size:12px;
+}
+body.jm-market-integrated #jm-market-layout .ux-toc-index{width:20px}
+body.jm-market-integrated #jm-market-layout .ux-sidebar-footer{padding:9px}
+body.jm-market-integrated #jm-market-content > .page{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0 0 64px!important;
+}
+body.jm-market-route #job-management-link{display:none!important}
+body.jm-market-route #ux-sidebar{visibility:hidden}
+body.jm-market-integrated #ux-sidebar{visibility:visible}
+body.jm-market-integrated #ux-mobile-toc-button{display:none!important}
+body.jm-market-integrated #ux-livebar{top:10px}
+@media(max-width:1080px){
+  #jm-market-layout{grid-template-columns:1fr}
+  body.jm-market-integrated #jm-market-layout #ux-sidebar{
+    position:sticky!important;
+    top:10px!important;
+    height:auto!important;
+    min-height:0;
+    display:block!important;
+    transform:none!important;
+  }
+  body.jm-market-integrated #jm-market-layout .ux-sidebar-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 13px;
+  }
+  body.jm-market-integrated #jm-market-layout .ux-sidebar-kicker,
+  body.jm-market-integrated #jm-market-layout .ux-sidebar-summary{display:none}
+  body.jm-market-integrated #jm-market-layout .ux-sidebar-title{
+    flex:0 0 auto;
+    font-size:14px;
+  }
+  body.jm-market-integrated #jm-market-layout .ux-toc{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:8px 10px 10px;
+  }
+  body.jm-market-integrated #jm-market-layout .ux-toc-link{
+    flex:0 0 auto;
+    margin:0;
+    white-space:nowrap;
+  }
+  body.jm-market-integrated #jm-market-layout .ux-sidebar-footer{display:none}
+}
+
 @media(max-width:1120px){:root{--jm-sidebar-width:202px}#jm-app-main{padding-left:14px;padding-right:14px}}
 @media(max-width:820px){
   #jm-app-shell{display:block}
@@ -403,6 +488,37 @@ SHELL_SCRIPT_TEMPLATE = r'''
       anchor.classList.add("jm-hide-global-link");
     }
   });
+
+  const integrateMarketDashboard = () => {
+    if (location.pathname !== "/dashboard") return;
+
+    const appMain = document.getElementById("jm-app-main");
+    const page = appMain?.querySelector(":scope > .page") || appMain?.querySelector(".page");
+    const marketNav = document.getElementById("ux-sidebar");
+    if (!appMain || !page || !marketNav || document.getElementById("jm-market-layout")) return;
+
+    document.body.classList.add("jm-market-integrated");
+    marketNav.setAttribute("aria-label", "市场分析子导航");
+
+    const kicker = marketNav.querySelector(".ux-sidebar-kicker");
+    const title = marketNav.querySelector(".ux-sidebar-title");
+    if (kicker) kicker.textContent = "MARKET ANALYSIS";
+    if (title) title.textContent = "市场分析";
+
+    document.getElementById("job-management-link")?.remove();
+
+    const layout = document.createElement("div");
+    layout.id = "jm-market-layout";
+
+    const content = document.createElement("div");
+    content.id = "jm-market-content";
+
+    appMain.insertBefore(layout, page);
+    layout.append(marketNav, content);
+    content.append(page);
+  };
+
+  integrateMarketDashboard();
 })();
 </script>
 '''
@@ -440,16 +556,20 @@ def inject_app_shell(document: str, path: str, app: Any) -> str:
         return document
 
     attrs = match.group("attrs")
+    route_class = " jm-market-route" if path == "/dashboard" else ""
     if re.search(r"\bclass=", attrs, flags=re.IGNORECASE):
         attrs = re.sub(
             r'class=(["\'])(.*?)\1',
-            lambda item: f'class={item.group(1)}{item.group(2)} jm-unified-shell-body{item.group(1)}',
+            lambda item: (
+                f'class={item.group(1)}{item.group(2)} '
+                f'jm-unified-shell-body{route_class}{item.group(1)}'
+            ),
             attrs,
             count=1,
             flags=re.IGNORECASE,
         )
     else:
-        attrs += ' class="jm-unified-shell-body"'
+        attrs += f' class="jm-unified-shell-body{route_class}"'
 
     replacement = f"<body{attrs}>\n{_shell_open(nav_links)}"
     document = document[: match.start()] + replacement + document[match.end() :]
