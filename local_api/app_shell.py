@@ -12,7 +12,7 @@ from fastapi import Request
 from starlette.responses import Response
 
 
-SHELL_VERSION = "1.1.0"
+SHELL_VERSION = "1.2.0"
 SHELL_MARKER = 'id="jm-app-shell"'
 SYSTEM_GLASS_MARKER = 'id="jm-system-glass-style"'
 
@@ -205,7 +205,7 @@ body.jm-unified-shell-body::before{
 .jm-brand-mark svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .jm-brand-copy{min-width:0;white-space:nowrap;transition:opacity .18s,transform .18s}
 .jm-brand-copy strong{display:block;font-size:14px;line-height:1.4}
-.jm-brand-copy span{display:block;margin-top:2px;color:var(--jm-muted);font-size:10px}
+.jm-brand-copy span{display:block;margin-top:2px;color:var(--jm-muted);font-size:12px}
 .jm-nav{display:grid;gap:6px;margin-top:6px}
 .jm-nav-item{
   position:relative;
@@ -219,7 +219,7 @@ body.jm-unified-shell-body::before{
   border-radius:14px;
   color:#52656b!important;
   text-decoration:none!important;
-  font-size:13px;
+  font-size:15px;
   font-weight:650;
   white-space:nowrap;
   transition:background .18s,border-color .18s,color .18s,transform .18s,box-shadow .18s;
@@ -245,9 +245,9 @@ body.jm-unified-shell-body::before{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.74);
   overflow:hidden;
 }
-.jm-status-line{display:flex;align-items:center;gap:8px;color:#4f646a;font-size:11px;font-weight:650;white-space:nowrap}
+.jm-status-line{display:flex;align-items:center;gap:8px;color:#4f646a;font-size:13px;font-weight:650;white-space:nowrap}
 .jm-status-dot{flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:#2fbea2;box-shadow:0 0 0 4px rgba(47,190,162,.12)}
-.jm-status-meta{display:block;margin:7px 0 0 16px;color:var(--jm-muted);font-size:9px;white-space:nowrap}
+.jm-status-meta{display:block;margin:7px 0 0 16px;color:var(--jm-muted);font-size:11px;white-space:nowrap}
 .jm-collapse{display:flex;align-items:center;justify-content:center;width:100%;min-height:35px;margin-top:9px;border:1px solid rgba(255,255,255,.76);border-radius:11px;color:#65777d;background:rgba(255,255,255,.48);cursor:pointer}
 .jm-collapse:hover{color:var(--jm-accent-dark);background:rgba(255,255,255,.76)}
 .jm-collapse svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;transition:transform .22s}
@@ -321,15 +321,15 @@ body.jm-market-integrated #jm-market-layout #ux-sidebar{
   box-shadow:0 16px 44px rgba(68,98,105,.10)!important;
 }
 body.jm-market-integrated #jm-market-layout .ux-sidebar-head{padding:17px 14px 13px}
-body.jm-market-integrated #jm-market-layout .ux-sidebar-kicker{font-size:9px}
-body.jm-market-integrated #jm-market-layout .ux-sidebar-title{font-size:17px}
+body.jm-market-integrated #jm-market-layout .ux-sidebar-kicker{font-size:12px}
+body.jm-market-integrated #jm-market-layout .ux-sidebar-title{font-size:20px}
 body.jm-market-integrated #jm-market-layout .ux-sidebar-summary{margin-top:7px}
 body.jm-market-integrated #jm-market-layout .ux-toc{padding:9px}
 body.jm-market-integrated #jm-market-layout .ux-toc-link{
   gap:8px;
   margin:2px 0;
   padding:9px 9px;
-  font-size:12px;
+  font-size:15px;
 }
 body.jm-market-integrated #jm-market-layout .ux-toc-index{width:20px}
 body.jm-market-integrated #jm-market-layout .ux-sidebar-footer{padding:9px}
@@ -447,10 +447,22 @@ body.jm-system-glass #jm-app-main .metric,
 body.jm-system-glass #jm-app-main .card,
 body.jm-system-glass #jm-app-main .calibration{
   border-color:rgba(255,255,255,.48)!important;
-  background:rgba(255,255,255,.45)!important;
+  background:rgba(255,255,255,.58)!important;
   box-shadow:0 18px 50px rgba(29,48,54,.14)!important;
   backdrop-filter:blur(30px) saturate(140%)!important;
   -webkit-backdrop-filter:blur(30px) saturate(140%)!important;
+}
+body.jm-system-glass #jm-app-main .step,
+body.jm-system-glass #jm-app-main .notice,
+body.jm-system-glass #jm-app-main .appearance-option,
+body.jm-system-glass #jm-app-main .path{
+  border-color:rgba(255,255,255,.50)!important;
+  background:rgba(255,255,255,.64)!important;
+}
+body.jm-system-glass #jm-app-main .sub,
+body.jm-system-glass #jm-app-main .helper,
+body.jm-system-glass #jm-app-main small{
+  color:#526970!important;
 }
 body.jm-system-glass #jm-app-main input,
 body.jm-system-glass #jm-app-main select,
@@ -492,7 +504,7 @@ def _shell_open(nav_links: str) -> str:
     <div class="jm-sidebar-spacer"></div>
     <div class="jm-sidebar-status">
       <span class="jm-status-line"><i class="jm-status-dot"></i>本地服务已连接</span>
-      <span class="jm-status-meta">统一桌面界面 · {SHELL_VERSION}</span>
+      <span class="jm-status-meta">数据保存在本机 · 桌面服务正常</span>
     </div>
     <button class="jm-collapse" id="jm-collapse" type="button" aria-label="折叠导航">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>

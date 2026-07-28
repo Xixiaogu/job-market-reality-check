@@ -175,7 +175,7 @@ HTML_TEMPLATE = r"""<!doctype html>
   <header class="top">
     <div>
       <h1>个人决策档案</h1>
-      <p class="sub">Phase __PAGE_VERSION__ · 首次使用、建议来源与样本成熟度</p>
+      <p class="sub">维护技能、项目经历、求职目标与求职约束</p>
     </div>
     <div class="actions">
       <span id="conn"><i id="dot" class="dot"></i>未连接</span>

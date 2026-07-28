@@ -64,7 +64,16 @@ def normalize_material(value: str | None) -> str:
 
 def requested_mode(environ: MutableMapping[str, str] | None = None) -> str:
     target = os.environ if environ is None else environ
-    return normalize_glass_mode(target.get(GLASS_MODE_ENV, MODE_SYSTEM))
+    if environ is not None:
+        return normalize_glass_mode(target.get(GLASS_MODE_ENV, MODE_SYSTEM))
+
+    try:
+        from local_api.appearance_settings import ACRYLIC, get_appearance
+
+        return MODE_SYSTEM if get_appearance(environ=target) == ACRYLIC else MODE_OFF
+    except Exception:
+        logging.debug("Could not read persisted appearance settings", exc_info=True)
+        return normalize_glass_mode(target.get(GLASS_MODE_ENV, MODE_SYSTEM))
 
 
 def requested_material(environ: MutableMapping[str, str] | None = None) -> str:

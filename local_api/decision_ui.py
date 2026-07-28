@@ -29,7 +29,7 @@ HTML_TEMPLATE = r'''<!doctype html>
 <body>
 <div class="shell">
   <header class="top">
-    <div><h1>投递决策中心</h1><p class="sub">Phase __PAGE_VERSION__ · 从岗位匹配解释到实际投递动作</p></div>
+    <div><h1>投递决策中心</h1><p class="sub">结合岗位匹配度、机会价值与求职约束生成投递建议</p></div>
     <div class="actions"><span id="conn"><i id="dot" class="dot"></i>未连接</span><select id="strategy" class="select" aria-label="投递策略"></select><a class="btn" href="/profile" target="_blank">个人档案</a><a class="btn" href="/manage" target="_blank">岗位管理</a><a class="btn" href="/dashboard" target="_blank">分析看板</a><button id="recalculate" class="btn primary">重新计算</button><button id="forget" class="btn danger">重新配对</button></div>
   </header>
 

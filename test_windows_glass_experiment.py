@@ -75,7 +75,7 @@ def test_source_markers() -> None:
     native = open("windows_glass.py", encoding="utf-8").read()
     shell = open("local_api/app_shell.py", encoding="utf-8").read()
 
-    assert "1.0.6-glass-exp" in desktop
+    assert "1.0.7-appearance" in desktop
     assert "configure_webview_environment" in desktop
     assert "apply_windows_glass" in desktop
     assert "WINDOWS_GLASS_EXPERIMENT_V1" in native

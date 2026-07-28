@@ -97,6 +97,12 @@ from .desktop_runtime import (
 from .pipeline import schedule_pipeline
 from .security import get_or_create_token
 from .setup_ui import render_launch_page, render_setup_page
+from .appearance_settings import (
+    ALLOWED_APPEARANCES,
+    appearance_status,
+    request_application_restart,
+    save_appearance,
+)
 
 
 @asynccontextmanager
@@ -274,6 +280,36 @@ def read_desktop_status(_: Protected) -> dict[str, Any]:
 def finish_desktop_setup(_: Protected) -> dict[str, Any]:
     state = complete_setup()
     return {"ok": True, "setup_completed": bool(state.get("setup_completed"))}
+
+
+@app.get("/api/v1/desktop/appearance")
+def read_desktop_appearance(_: Protected) -> dict[str, Any]:
+    return appearance_status()
+
+
+@app.put("/api/v1/desktop/appearance")
+def update_desktop_appearance(
+    _: Protected,
+    payload: Annotated[dict[str, Any], Body()],
+) -> dict[str, Any]:
+    appearance = str(payload.get("appearance", "")).strip().lower()
+    if appearance not in ALLOWED_APPEARANCES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="appearance 必须是 standard 或 acrylic。",
+        )
+
+    save_appearance(appearance)
+    result = appearance_status()
+    restart = bool(payload.get("restart", True))
+    if restart:
+        request_application_restart()
+
+    return {
+        "ok": True,
+        **result,
+        "restart_requested": restart,
+    }
 
 
 @app.post("/api/v1/desktop/open-extension-folder")

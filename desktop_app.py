@@ -6,6 +6,7 @@ import html
 import json
 import logging
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -19,7 +20,7 @@ import desktop_launcher as legacy
 
 PRODUCT_TITLE = "招聘市场分析与投递决策系统"
 APP_USER_MODEL_ID = "JobMarketDecisionSystem.Desktop.1"
-SHELL_VERSION = "1.0.6-glass-exp"
+SHELL_VERSION = "1.0.7-appearance"
 
 
 def is_headless_request(argv: list[str]) -> bool:
@@ -240,6 +241,7 @@ class DesktopShell:
         next_path: str,
         user_data: Path,
         signal_path: Path,
+        restart_path: Path,
     ) -> None:
         self.window = window
         self.host = host
@@ -248,8 +250,10 @@ class DesktopShell:
         self.next_path = next_path
         self.user_data = user_data
         self.signal_path = signal_path
+        self.restart_path = restart_path
         self.log_path = user_data / "logs" / "app.log"
         self.exit_requested = False
+        self.restart_requested = False
         self.tray_ready = False
         self.tray_icon: Any | None = None
         self.server: Any | None = None
@@ -358,6 +362,13 @@ class DesktopShell:
         except Exception:
             logging.debug("Could not destroy main window", exc_info=True)
 
+    def request_restart(self) -> None:
+        if self.restart_requested:
+            return
+        self.restart_requested = True
+        logging.info("Application restart requested from settings page")
+        self.request_exit()
+
     def _run_tray(self) -> None:
         try:
             import pystray
@@ -409,10 +420,15 @@ class DesktopShell:
         )
         self.tray_thread.start()
 
-    def _watch_show_signal(self) -> None:
+    def _watch_runtime_signals(self) -> None:
         last_seen = 0
         while not self.stop_event.wait(0.3):
             try:
+                if self.restart_path.exists():
+                    self.restart_path.unlink(missing_ok=True)
+                    self.request_restart()
+                    return
+
                 if not self.signal_path.exists():
                     continue
                 modified = self.signal_path.stat().st_mtime_ns
@@ -420,12 +436,12 @@ class DesktopShell:
                     last_seen = modified
                     self.show_window()
             except OSError:
-                logging.debug("Show-signal watcher failed", exc_info=True)
+                logging.debug("Desktop runtime signal watcher failed", exc_info=True)
 
     def _start_signal_watcher(self) -> None:
         self.signal_thread = threading.Thread(
-            target=self._watch_show_signal,
-            name="desktop-show-signal",
+            target=self._watch_runtime_signals,
+            name="desktop-runtime-signals",
             daemon=True,
         )
         self.signal_thread.start()
@@ -514,6 +530,25 @@ class DesktopShell:
                 pass
 
 
+def relaunch_current_process() -> None:
+    if legacy.is_frozen():
+        command = [sys.executable, *sys.argv[1:]]
+        cwd = str(Path(sys.executable).resolve().parent)
+    else:
+        command = [sys.executable, str(Path(__file__).resolve()), *sys.argv[1:]]
+        cwd = str(Path(__file__).resolve().parent)
+
+    creationflags = 0
+    if os.name == "nt":
+        creationflags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
+    subprocess.Popen(
+        command,
+        cwd=cwd,
+        close_fds=True,
+        creationflags=creationflags,
+    )
+
+
 def run_desktop_shell() -> int:
     args = legacy.build_parser().parse_args()
     user_data = (args.user_data_dir or legacy.default_user_data_root()).resolve()
@@ -573,6 +608,8 @@ def run_desktop_shell() -> int:
             USER_DATA_ROOT / "runtime" / "desktop-shell.lock"
         )
         signal_path = USER_DATA_ROOT / "runtime" / "show-window.request"
+        restart_path = USER_DATA_ROOT / "runtime" / "restart-app.request"
+        restart_path.unlink(missing_ok=True)
         if not locked:
             request_existing_window(signal_path)
             lock_handle.close()
@@ -605,6 +642,7 @@ def run_desktop_shell() -> int:
             next_path=next_path,
             user_data=USER_DATA_ROOT,
             signal_path=signal_path,
+            restart_path=restart_path,
         )
         window.events.before_show += shell.before_show
         window.events.closing += shell.on_closing
@@ -613,6 +651,7 @@ def run_desktop_shell() -> int:
         storage_path = USER_DATA_ROOT / "runtime" / "webview-profile"
         storage_path.mkdir(parents=True, exist_ok=True)
 
+        restart_requested = False
         try:
             webview.start(
                 shell.bootstrap,
@@ -621,10 +660,15 @@ def run_desktop_shell() -> int:
                 private_mode=False,
                 storage_path=str(storage_path),
             )
-            return 0
+            restart_requested = shell.restart_requested
         finally:
             shell.cleanup()
             legacy.release_lock(lock_handle, locked)
+
+        if restart_requested:
+            time.sleep(0.35)
+            relaunch_current_process()
+        return 0
 
     except Exception as exc:
         logging.exception("Desktop application failed")

@@ -27,7 +27,7 @@ HTML_TEMPLATE = r'''<!doctype html>
 </head>
 <body>
 <div class="shell">
-  <header class="top"><div><h1>岗位管理中心</h1><p class="sub">Phase __PAGE_VERSION__ · 分类、求职进度、归档与状态历史</p></div><div class="actions"><span id="conn"><i id="dot" class="dot"></i>未连接</span><a class="btn" href="/dashboard" target="_blank">分析看板</a><button id="refresh" class="btn">刷新</button><button id="forget" class="btn danger">重新配对</button></div></header>
+  <header class="top"><div><h1>岗位管理中心</h1><p class="sub">集中管理岗位、求职进度、备注、归档与状态历史</p></div><div class="actions"><span id="conn"><i id="dot" class="dot"></i>未连接</span><a class="btn" href="/dashboard" target="_blank">分析看板</a><button id="refresh" class="btn">刷新</button><button id="forget" class="btn danger">重新配对</button></div></header>
   <section id="pair" class="pair"><div><h2>首次使用需要配对本地 API</h2><p>从首次启动设置页复制本地 API 令牌。令牌只保存在当前浏览器的 localStorage。</p></div><div class="pair-controls"><input id="token" class="input" type="password" placeholder="粘贴本地 API 令牌"><button id="save-token" class="btn primary">保存并连接</button></div></section>
   <section class="summary"><article class="metric"><span>全部岗位</span><strong id="m-total">—</strong></article><article class="metric"><span>未归档</span><strong id="m-active">—</strong></article><article class="metric"><span>感兴趣</span><strong id="m-interested">—</strong></article><article class="metric"><span>已投递</span><strong id="m-applied">—</strong></article><article class="metric"><span>已归档</span><strong id="m-archived">—</strong></article></section>
   <section class="panel">

@@ -38,6 +38,19 @@ html {
 
 body.dashboard-ux-enabled {
     overflow-x: hidden;
+    color: #20343a;
+    font-size: 15px;
+}
+
+body.dashboard-ux-enabled > .page > header h1 {
+    font-size: 36px;
+    line-height: 1.25;
+}
+
+body.dashboard-ux-enabled > .page > header p {
+    color: #526970;
+    font-size: 15px;
+    line-height: 1.75;
 }
 
 #ux-reading-track {
@@ -81,7 +94,7 @@ body.dashboard-ux-enabled {
 .ux-sidebar-kicker {
     margin: 0 0 4px;
     color: var(--ux-primary);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 850;
     letter-spacing: 0.13em;
 }
@@ -96,8 +109,8 @@ body.dashboard-ux-enabled {
 .ux-sidebar-summary {
     margin: 10px 0 0;
     color: #6d7f85;
-    font-size: 11px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.65;
 }
 
 .ux-toc {
@@ -115,8 +128,8 @@ body.dashboard-ux-enabled {
     border-radius: 10px;
     color: #52666d;
     text-decoration: none;
-    font-size: 13px;
-    font-weight: 650;
+    font-size: 15px;
+    font-weight: 700;
     transition: background 150ms ease, color 150ms ease, transform 150ms ease;
 }
 
@@ -134,7 +147,7 @@ body.dashboard-ux-enabled {
 .ux-toc-index {
     width: 24px;
     color: #8ba0a5;
-    font-size: 10px;
+    font-size: 12px;
     font-variant-numeric: tabular-nums;
 }
 
@@ -155,7 +168,7 @@ body.dashboard-ux-enabled {
     color: var(--ux-primary-dark);
     background: white;
     font: inherit;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 750;
     cursor: pointer;
 }
@@ -196,12 +209,12 @@ body.dashboard-ux-enabled > .page {
     align-items: center;
     gap: 7px;
     color: #53686f;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .ux-live-item strong {
     color: #17262c;
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .ux-status-dot {
@@ -245,7 +258,7 @@ body.dashboard-ux-enabled > .page {
     gap: 12px;
     margin-bottom: 7px;
     color: #53686f;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .ux-pipeline-label {
@@ -286,8 +299,8 @@ body.dashboard-ux-enabled > .page {
     border-radius: 12px;
     background: #fff7d9;
     color: #69510d;
-    font-size: 12px;
-    line-height: 1.55;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 #ux-update-banner.is-visible {
@@ -302,7 +315,7 @@ body.dashboard-ux-enabled > .page {
     color: white;
     background: #9c7400;
     font: inherit;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 750;
     cursor: pointer;
 }
@@ -356,7 +369,7 @@ body.dashboard-ux-enabled > .page {
     border-radius: 10px;
     color: var(--ux-primary-dark);
     background: var(--ux-primary-soft);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 850;
 }
 
@@ -369,8 +382,8 @@ body.dashboard-ux-enabled > .page {
 .analysis-section-subtitle {
     margin: 4px 0 0;
     color: #6b7e84;
-    font-size: 12px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.65;
 }
 
 .analysis-section-toggle {
@@ -488,7 +501,7 @@ body.dashboard-ux-enabled > .page {
 .ux-lightbox-caption {
     padding: 14px 18px 17px;
     color: #42575e;
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .ux-lightbox-close {
@@ -681,8 +694,8 @@ JS_TEMPLATE = r"""
     document.body.classList.add('dashboard-ux-enabled');
 
     const h1 = page.querySelector('h1');
-    if (h1) h1.textContent = '岗位市场分析看板 v1.2';
-    document.title = '岗位市场分析看板 v1.2';
+    if (h1) h1.textContent = '岗位市场分析';
+    document.title = '岗位市场分析';
 
     const readingTrack = document.createElement('div');
     readingTrack.id = 'ux-reading-track';
