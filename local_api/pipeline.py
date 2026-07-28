@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import subprocess
@@ -12,8 +12,11 @@ from typing import Any
 from .config import (
     DASHBOARD_PATH,
     PIPELINE_LOG_DIR,
+    IS_FROZEN,
     PIPELINE_SCRIPTS,
     PROJECT_ROOT,
+    USER_DATA_ROOT,
+    WORK_ROOT,
     ensure_runtime_directories,
 )
 from .database import (
@@ -106,9 +109,22 @@ def run_pipeline_sync(run_id: int | None = None) -> dict[str, Any]:
                 "\n" + "=" * 72 + f"\n{current_step}\n" + "=" * 72,
             )
 
+            # PHASE_92_WINDOWS_PACKAGE
+            command = (
+                [
+                    sys.executable,
+                    "--run-script",
+                    script_name,
+                    "--no-migrate",
+                    "--user-data-dir",
+                    str(USER_DATA_ROOT),
+                ]
+                if IS_FROZEN
+                else [sys.executable, str(script_path)]
+            )
             result = subprocess.run(
-                [sys.executable, str(script_path)],
-                cwd=PROJECT_ROOT,
+                command,
+                cwd=WORK_ROOT,
                 env=environment,
                 text=True,
                 capture_output=True,

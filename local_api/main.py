@@ -21,10 +21,12 @@ from fastapi.responses import FileResponse
 
 from . import __version__
 from .config import (
+    APP_MODE,
     DASHBOARD_PATH,
     DB_PATH,
     PROJECT_ROOT,
     TOKEN_PATH,
+    USER_DATA_ROOT,
 )
 from .database import (
     count_jobs,
@@ -85,8 +87,16 @@ from .decision import (
     recalculate_decisions,
 )
 from .decision_ui import render_decision_page
+from .desktop_runtime import (
+    complete_setup,
+    desktop_status,
+    open_extension_folder,
+    open_user_data_folder,
+    record_extension_activity,
+)
 from .pipeline import schedule_pipeline
 from .security import get_or_create_token
+from .setup_ui import render_launch_page, render_setup_page
 
 
 @asynccontextmanager
@@ -151,8 +161,42 @@ def root() -> dict[str, Any]:
         "profile": "/profile",
         "calibrate": "/calibrate",
         "decision": "/decision",
+        "setup": "/setup",
         "decision_api": "/api/v1/decision/summary",
     }
+
+
+# PHASE_91_DESKTOP_PRODUCTIZATION
+@app.get(
+    "/launch",
+    response_class=ManagementHTMLResponse,
+)
+def launch_page(
+    next_path: str = Query(default="/decision", alias="next"),
+) -> ManagementHTMLResponse:
+    return ManagementHTMLResponse(
+        content=render_launch_page(next_path),
+        headers={
+            "Cache-Control": "no-store, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
+
+
+@app.get(
+    "/setup",
+    response_class=ManagementHTMLResponse,
+)
+def setup_page() -> ManagementHTMLResponse:
+    return ManagementHTMLResponse(
+        content=render_setup_page(),
+        headers={
+            "Cache-Control": "no-store, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        },
+    )
 
 
 @app.get("/dashboard")
@@ -221,6 +265,39 @@ def calibration_page() -> ManagementHTMLResponse:
     )
 
 
+@app.get("/api/v1/desktop/status")
+def read_desktop_status(_: Protected) -> dict[str, Any]:
+    return desktop_status(job_count=count_jobs())
+
+
+@app.post("/api/v1/desktop/complete-setup")
+def finish_desktop_setup(_: Protected) -> dict[str, Any]:
+    state = complete_setup()
+    return {"ok": True, "setup_completed": bool(state.get("setup_completed"))}
+
+
+@app.post("/api/v1/desktop/open-extension-folder")
+def show_extension_folder(_: Protected) -> dict[str, Any]:
+    try:
+        return open_extension_folder()
+    except (FileNotFoundError, OSError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+
+
+@app.post("/api/v1/desktop/open-user-data-folder")
+def show_user_data_folder(_: Protected) -> dict[str, Any]:
+    try:
+        return open_user_data_folder()
+    except OSError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
+        ) from exc
+
+
 # PHASE_82C_DECISION_CENTER_API
 @app.get(
     "/decision",
@@ -244,7 +321,9 @@ def health() -> dict[str, Any]:
         "ok": True,
         "service": "job-market-reality-check-local-api",
         "version": __version__,
+        "app_mode": APP_MODE,
         "project_root": str(PROJECT_ROOT),
+        "user_data_root": str(USER_DATA_ROOT),
         "database_path": str(DB_PATH),
         "job_count": count_jobs(),
         "dashboard_exists": DASHBOARD_PATH.exists(),
@@ -768,6 +847,10 @@ def upsert_job(
         )
 
     result = upsert_extension_job(payload)
+    record_extension_activity(
+        source="single_upsert",
+        imported_count=1,
+    )
     response: dict[str, Any] = {
         "ok": True,
         "action": result["action"],
@@ -829,6 +912,13 @@ def bulk_upsert_jobs(
         result = upsert_extension_job(payload)
         results[result["action"]] += 1
 
+    successful_count = len(payloads) - results["failed"]
+    if successful_count > 0:
+        record_extension_activity(
+            source="bulk_upsert",
+            imported_count=successful_count,
+        )
+
     response: dict[str, Any] = {
         "ok": results["failed"] == 0,
         "results": results,
@@ -862,6 +952,8 @@ def pipeline_status(_: Protected) -> dict[str, Any]:
 @app.get("/api/v1/runtime")
 def runtime_info(_: Protected) -> dict[str, str]:
     return {
+        "app_mode": APP_MODE,
+        "user_data_root": str(USER_DATA_ROOT),
         "database_path": str(DB_PATH),
         "token_path": str(TOKEN_PATH),
         "dashboard_path": str(DASHBOARD_PATH),
@@ -881,3 +973,8 @@ def runtime_info(_: Protected) -> dict[str, str]:
 
 
 # PHASE_82A_CALIBRATION_API
+
+# UNIFIED_APP_SHELL_V1_INSTALL
+from .app_shell import install_unified_app_shell
+
+install_unified_app_shell(app)

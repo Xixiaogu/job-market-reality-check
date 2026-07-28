@@ -1,0 +1,23 @@
+浏览器扩展安装说明
+====================
+
+当前 V1.0 采用“软件包内附带扩展目录 + 开发者模式加载”。
+
+Chrome：
+1. 打开 chrome://extensions
+2. 开启右上角“开发者模式”
+3. 点击“加载已解压的扩展程序”
+4. 选择 browser-extension\chrome-mv3
+5. 固定扩展到浏览器工具栏
+
+Edge：
+1. 打开 edge://extensions
+2. 开启“开发人员模式”
+3. 点击“加载解压缩的扩展”
+4. 选择 browser-extension\chrome-mv3
+
+连接配置：
+- API 地址：http://127.0.0.1:8765
+- API 令牌：从软件首次设置页复制
+
+扩展目录中必须存在 manifest.json。

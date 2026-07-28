@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 
 def render_calibration_page() -> str:
@@ -30,7 +30,7 @@ def render_calibration_page() -> str:
   </section>
 
   <section id="pair" class="pair">
-    <input id="token" type="password" placeholder="粘贴 local_api/runtime/api_token.txt 内容">
+    <input id="token" type="password" placeholder="粘贴首次启动页提供的本地 API 令牌">
     <button id="save-token">保存并连接</button>
   </section>
 

@@ -1,3 +1,3 @@
-"""Local FastAPI and SQLite service for Job Market Reality Check."""
+﻿"""Local FastAPI and SQLite service for Job Market Reality Check."""
 
-__version__ = "0.2.0"
+__version__ = "1.0.0"

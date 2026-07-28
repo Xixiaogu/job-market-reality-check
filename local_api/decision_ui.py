@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 PAGE_VERSION = "8.2C"
 
@@ -33,7 +33,7 @@ HTML_TEMPLATE = r'''<!doctype html>
     <div class="actions"><span id="conn"><i id="dot" class="dot"></i>未连接</span><select id="strategy" class="select" aria-label="投递策略"></select><a class="btn" href="/profile" target="_blank">个人档案</a><a class="btn" href="/manage" target="_blank">岗位管理</a><a class="btn" href="/dashboard" target="_blank">分析看板</a><button id="recalculate" class="btn primary">重新计算</button><button id="forget" class="btn danger">重新配对</button></div>
   </header>
 
-  <section id="pair" class="pair"><div><h2>首次使用需要配对本地 API</h2><p>粘贴 <code>local_api/runtime/api_token.txt</code> 中的完整令牌。与岗位管理和个人档案共用同一个浏览器令牌。</p></div><div class="pair-controls"><input id="token" class="input" type="password" placeholder="粘贴本地 API 令牌"><button id="save-token" class="btn primary">保存并连接</button></div></section>
+  <section id="pair" class="pair"><div><h2>首次使用需要配对本地 API</h2><p>从首次启动设置页复制本地 API 令牌。与岗位管理和个人档案共用同一个浏览器令牌。</p></div><div class="pair-controls"><input id="token" class="input" type="password" placeholder="粘贴本地 API 令牌"><button id="save-token" class="btn primary">保存并连接</button></div></section>
 
   <section class="hero">
     <article class="metric"><span>待决策岗位</span><strong id="m-queue">—</strong></article>

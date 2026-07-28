@@ -1,0 +1,6 @@
+[
+  {"job_id": "job-001", "label": "apply_now"},
+  {"job_id": "job-002", "label": "stretch"},
+  {"job_id": "job-003", "label": "defer"},
+  {"job_id": "job-004", "label": "prepare_first"}
+]

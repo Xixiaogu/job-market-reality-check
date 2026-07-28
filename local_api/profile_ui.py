@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 PAGE_VERSION = "8.1C"
 
@@ -190,7 +190,7 @@ HTML_TEMPLATE = r"""<!doctype html>
   <section id="pair" class="pair">
     <div>
       <h2>首次使用需要配对本地 API</h2>
-      <p>粘贴 <code>local_api/runtime/api_token.txt</code> 中的完整令牌。与岗位管理中心共用同一个浏览器令牌。</p>
+      <p>从首次启动设置页复制本地 API 令牌。与岗位管理中心共用同一个浏览器令牌。</p>
     </div>
     <div class="pair-controls">
       <input id="token" class="input" type="password" placeholder="粘贴本地 API 令牌">

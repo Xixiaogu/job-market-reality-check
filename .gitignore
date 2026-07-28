@@ -46,3 +46,21 @@ data/*.db
 data/*.db-*
 local_api/runtime/
 output/local_api/
+# Desktop build and release output
+.build/
+build/
+dist/
+release/
+
+# Local backups and runtime artifacts
+phase91_offline_error.txt
+
+# Python caches
+
+# Local databases, credentials, and runtime state
+*.db
+*.db-journal
+api_token.txt
+
+# Generated local Agent discovery copy
+.agents/
