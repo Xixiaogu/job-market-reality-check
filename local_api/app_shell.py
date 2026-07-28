@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 from typing import Any
 
@@ -13,6 +14,12 @@ from starlette.responses import Response
 
 SHELL_VERSION = "1.1.0"
 SHELL_MARKER = 'id="jm-app-shell"'
+SYSTEM_GLASS_MARKER = 'id="jm-system-glass-style"'
+
+def _system_glass_enabled() -> bool:
+    value = os.environ.get("JM_GLASS_MODE", "").strip().lower()
+    return value in {"1", "true", "yes", "on", "system", "glass"}
+
 EXCLUDED_PATHS = {
     "/launch",
     "/docs",
@@ -387,6 +394,84 @@ body.jm-market-integrated #ux-livebar{top:10px}
 '''
 
 
+
+SYSTEM_GLASS_STYLE = r"""
+<style id="jm-system-glass-style">
+html{
+  background:transparent!important;
+}
+body.jm-unified-shell-body.jm-system-glass{
+  --jm-glass:rgba(255,255,255,.34);
+  --jm-line:rgba(255,255,255,.42);
+  --jm-shadow:0 28px 78px rgba(25,43,49,.20);
+  --jm-card-shadow:0 16px 46px rgba(29,49,55,.14);
+  background:transparent!important;
+}
+body.jm-system-glass::before{
+  display:none!important;
+  background:none!important;
+}
+body.jm-system-glass #jm-app-shell,
+body.jm-system-glass #jm-app-main{
+  background:transparent!important;
+}
+body.jm-system-glass #jm-sidebar{
+  border-right-color:rgba(255,255,255,.48)!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.30),rgba(235,248,244,.14))!important;
+  box-shadow:
+    12px 0 44px rgba(21,42,48,.13),
+    inset -1px 0 0 rgba(255,255,255,.24)!important;
+  backdrop-filter:blur(42px) saturate(155%)!important;
+  -webkit-backdrop-filter:blur(42px) saturate(155%)!important;
+}
+body.jm-system-glass .jm-nav-item:hover,
+body.jm-system-glass .jm-collapse,
+body.jm-system-glass .jm-sidebar-status{
+  background:rgba(255,255,255,.30)!important;
+}
+body.jm-system-glass .jm-nav-item.is-active{
+  border-color:rgba(255,255,255,.60)!important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.55),rgba(188,239,224,.31))!important;
+}
+body.jm-system-glass #jm-app-main .top{
+  border-color:rgba(255,255,255,.56)!important;
+  background:rgba(255,255,255,.39)!important;
+  box-shadow:0 18px 48px rgba(28,48,54,.13)!important;
+  backdrop-filter:blur(34px) saturate(145%)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(145%)!important;
+}
+body.jm-system-glass #jm-app-main .panel,
+body.jm-system-glass #jm-app-main .metric,
+body.jm-system-glass #jm-app-main .card,
+body.jm-system-glass #jm-app-main .calibration{
+  border-color:rgba(255,255,255,.48)!important;
+  background:rgba(255,255,255,.45)!important;
+  box-shadow:0 18px 50px rgba(29,48,54,.14)!important;
+  backdrop-filter:blur(30px) saturate(140%)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(140%)!important;
+}
+body.jm-system-glass #jm-app-main input,
+body.jm-system-glass #jm-app-main select,
+body.jm-system-glass #jm-app-main textarea,
+body.jm-system-glass #jm-app-main button:not(.primary){
+  border-color:rgba(255,255,255,.48)!important;
+  background:rgba(255,255,255,.42)!important;
+}
+body.jm-system-glass #jm-market-layout #ux-sidebar{
+  border-color:rgba(255,255,255,.48)!important;
+  background:rgba(255,255,255,.31)!important;
+  backdrop-filter:blur(38px) saturate(150%)!important;
+  -webkit-backdrop-filter:blur(38px) saturate(150%)!important;
+}
+body.jm-system-glass #jm-market-content > .page{
+  background:transparent!important;
+}
+</style>
+"""
+
+
 def _shell_open(nav_links: str) -> str:
     return f'''
 <button id="jm-mobile-toggle" type="button" aria-label="打开导航">
@@ -542,13 +627,19 @@ def inject_app_shell(document: str, path: str, app: Any) -> str:
     if re.search(r"</head\s*>", document, flags=re.IGNORECASE):
         document = re.sub(
             r"</head\s*>",
-            SHELL_STYLE + "\n</head>",
+            SHELL_STYLE
+            + (SYSTEM_GLASS_STYLE if _system_glass_enabled() else "")
+            + "\n</head>",
             document,
             count=1,
             flags=re.IGNORECASE,
         )
     else:
-        document = SHELL_STYLE + document
+        document = (
+            SHELL_STYLE
+            + (SYSTEM_GLASS_STYLE if _system_glass_enabled() else "")
+            + document
+        )
 
     body_pattern = re.compile(r"<body(?P<attrs>[^>]*)>", flags=re.IGNORECASE)
     match = body_pattern.search(document)
@@ -557,6 +648,8 @@ def inject_app_shell(document: str, path: str, app: Any) -> str:
 
     attrs = match.group("attrs")
     route_class = " jm-market-route" if path == "/dashboard" else ""
+    if _system_glass_enabled():
+        route_class += " jm-system-glass"
     if re.search(r"\bclass=", attrs, flags=re.IGNORECASE):
         attrs = re.sub(
             r'class=(["\'])(.*?)\1',

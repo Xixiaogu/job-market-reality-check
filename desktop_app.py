@@ -19,7 +19,7 @@ import desktop_launcher as legacy
 
 PRODUCT_TITLE = "招聘市场分析与投递决策系统"
 APP_USER_MODEL_ID = "JobMarketDecisionSystem.Desktop.1"
-SHELL_VERSION = "1.0.1"
+SHELL_VERSION = "1.0.6-glass-exp"
 
 
 def is_headless_request(argv: list[str]) -> bool:
@@ -258,6 +258,9 @@ class DesktopShell:
         self.stop_event = threading.Event()
         self.signal_thread: threading.Thread | None = None
         self.tray_thread: threading.Thread | None = None
+        self.glass_mode = os.environ.get("JM_GLASS_MODE", "system")
+        self.glass_material = os.environ.get("JM_GLASS_MATERIAL", "acrylic")
+        self.glass_result: dict[str, Any] | None = None
 
     def _load_status(self, status: str, detail: str = "") -> None:
         try:
@@ -266,18 +269,32 @@ class DesktopShell:
             logging.debug("Could not update startup window", exc_info=True)
 
     def before_show(self) -> None:
-        icon_path = branding_path("app_icon.ico")
-        if os.name != "nt" or not icon_path.exists():
+        if os.name != "nt":
             return
+
+        icon_path = branding_path("app_icon.ico")
+        if icon_path.exists():
+            try:
+                import clr
+
+                clr.AddReference("System.Drawing")
+                from System.Drawing import Icon
+
+                self.window.native.Icon = Icon(str(icon_path))
+            except Exception:
+                logging.debug("Could not set native window icon", exc_info=True)
+
         try:
-            import clr
+            from windows_glass import apply_windows_glass
 
-            clr.AddReference("System.Drawing")
-            from System.Drawing import Icon
-
-            self.window.native.Icon = Icon(str(icon_path))
+            self.glass_result = apply_windows_glass(
+                self.window.native,
+                mode=self.glass_mode,
+                material=self.glass_material,
+            )
+            logging.info("Windows glass experiment result: %s", self.glass_result)
         except Exception:
-            logging.debug("Could not set native window icon", exc_info=True)
+            logging.exception("Windows glass experiment failed; using standard window")
 
     def on_closing(self) -> bool:
         if self.exit_requested or not self.tray_ready:
@@ -526,11 +543,24 @@ def run_desktop_shell() -> int:
 
         ensure_runtime_directories()
         token = get_or_create_token()
+        from windows_glass import (
+            configure_webview_environment,
+            requested_material,
+            requested_mode,
+        )
+
+        glass_mode = requested_mode()
+        glass_material = requested_material()
+        glass_environment = configure_webview_environment(glass_mode)
+        logging.info("Windows glass experiment environment: %s", glass_environment)
+
         state = write_desktop_state(
             {
                 "last_launcher_mode": APP_MODE,
                 "last_launcher_version": SHELL_VERSION,
                 "desktop_shell_enabled": True,
+                "windows_glass_mode": glass_mode,
+                "windows_glass_material": glass_material,
             }
         )
         next_path = (
@@ -561,7 +591,9 @@ def run_desktop_shell() -> int:
             min_size=(980, 640),
             resizable=True,
             maximized=False,
-            background_color="#f4f7fb",
+            background_color=(
+                "#000000" if glass_mode == "system" else "#f4f7fb"
+            ),
             text_select=True,
             zoomable=True,
         )
