@@ -63,9 +63,10 @@ flowchart LR
 
 The v1.0.7 release provides:
 
-- `JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip`
-- `JobMarketDecisionSystem-Setup-v1.0.7.exe`
-- SHA256 files for both artifacts
+- [Portable Windows ZIP](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip)
+- [Per-user Windows installer](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe)
+- [ZIP SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip.sha256)
+- [Installer SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe.sha256)
 
 The installer is per-user and does not require administrator privileges. It is not code-signed, so Windows may show an unknown-publisher warning. Release assets are published only after the public-readiness checks pass.
 
