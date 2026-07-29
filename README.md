@@ -3,9 +3,28 @@
 Local-first Windows desktop software that turns collected job postings and
 user-provided evidence into **explainable application priorities**.
 
-不是又一个职位收藏夹，而是帮你回答：**“以我现在的条件，优先投哪些？为什么？”**
+本地运行的 Windows 求职分析与投递决策工具，支持岗位采集、个人档案、市场分析、投递优先级判断和投递状态跟踪。
 
 [![CI](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml/badge.svg)](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Xixiaogu/job-market-reality-check?label=release&color=2563eb)](https://github.com/Xixiaogu/job-market-reality-check/releases/latest) [![Skill](https://img.shields.io/badge/Agent%20Skill-v0.1.0-7c3aed)](https://github.com/Xixiaogu/job-market-reality-check/tree/skill-v0.1.0) [![Platform](https://img.shields.io/badge/platform-Windows-0078d4)](https://github.com/Xixiaogu/job-market-reality-check) [![License](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
+
+## Abstract
+
+**Job Market Reality Check** is a local-first job analysis and application-
+prioritization system for students and early-career candidates. It combines a
+browser extension, a local FastAPI + SQLite service, a Windows desktop
+interface and a read-only Agent Skill to connect job facts with the user's
+skills, project evidence, availability and constraints.
+
+Instead of returning an opaque match score, the system explains each decision
+through four action groups: **apply now**, **stretch**, **prepare first** and
+**defer**.
+
+> [!IMPORTANT]
+> **Current source boundary:** the first public release, **v1.0.7**, supports
+> user-triggered collection from **BOSS直聘 job-detail pages only**. LinkedIn,
+> Indeed, 拉勾, 猎聘 and other recruitment sources are not supported in the
+> current version. Multi-source ingestion is future work, not an implemented
+> capability.
 
 ## Download v1.0.7
 
@@ -17,11 +36,6 @@ user-provided evidence into **explainable application priorities**.
 > Windows may show an unknown-publisher warning. The browser extension is
 > loaded manually in developer mode.
 
-> **Collection scope:** v1.0.7 currently supports user-triggered capture from
-> BOSS直聘 job-detail pages only. Other recruitment sites, list-page crawling
-> and unattended bulk collection are not supported.
-
-![End-to-end BOSS capture, local sync and Windows Acrylic decision workflow](docs/assets/workflow-demo-acrylic.gif)
 
 _End-to-end workflow: a sanitized BOSS job-detail page is captured by the
 browser extension, written to local SQLite, and reflected in the Windows
@@ -36,20 +50,38 @@ Most job tools stop after saving a posting. This project asks a harder question:
 
 The product keeps evidence and decisions separate. Job facts, candidate facts and manual labels live in local SQLite; the decision engine produces transparent dimensions and four action groups; the read-only Agent Skill explains those results without reimplementing the scoring logic.
 
-## Product loop
+## Product workflow
 
 ```mermaid
 flowchart LR
-    A["User opens a supported<br/>BOSS job-detail page"] --> B["Browser extension<br/>user-triggered capture"]
-    B --> C["Local FastAPI<br/>127.0.0.1 only"]
-    C --> D[("SQLite<br/>jobs + profile + state")]
-    D --> E["Market analysis<br/>and calibration"]
-    E --> F["Explainable decision engine"]
-    F --> G["Apply now / Stretch /<br/>Prepare first / Defer"]
-    D --> H["Read-only Agent Skill"]
-    F --> H
-    H --> I["Briefs, comparisons<br/>and action plans"]
+    subgraph Collect["1 · Collect"]
+        A["BOSS直聘<br/>job-detail page"]
+        B["Browser extension<br/>user-triggered"]
+        A --> B
+    end
+
+    subgraph Local["2 · Analyze locally"]
+        C["FastAPI<br/>localhost only"]
+        D[("SQLite")]
+        E["Evidence model<br/>jobs · profile · calibration"]
+        F["Decision engine<br/>match · value · cost · risk"]
+        C --> D --> E --> F
+    end
+
+    subgraph Act["3 · Decide and act"]
+        G["Windows desktop<br/>review and tracking"]
+        H["Read-only Agent Skill<br/>brief · explain · compare · plan"]
+    end
+
+    B --> C
+    F --> G
+    D -. "read facts" .-> H
+    F -. "read decisions" .-> H
 ```
+
+The ingestion boundary is intentionally narrow in v1.0.7: only manually
+triggered capture from supported BOSS直聘 job-detail pages enters the local
+workflow.
 
 ## What is implemented
 
