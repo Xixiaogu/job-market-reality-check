@@ -1,77 +1,37 @@
 ---
 name: job-market-reality-check
-description: >
-  Analyze a user's collected job postings against their real skills, projects, constraints, and goals.
-  Use this skill for job-market reality checks, application prioritization, skill-gap analysis,
-  four-tier application decisions (apply now, stretch, prepare first, defer), evidence mapping,
-  and short job-search action plans based on CSV, JSON, JSONL, pasted, exported, or locally stored job data.
-  Do not use it merely to rewrite one resume bullet or to search live openings without market analysis.
-license: MIT
-compatibility: Works in ChatGPT Skills, Codex, and Agent Skills-compatible clients. Bundled scripts require Python 3.10+ and use only the standard library.
-metadata:
-  author: job-market-reality-check
-  version: "1.0.0"
+description: Analyze collected job postings against a user's real skills, projects, constraints, and goals. Use for job-market reality checks, evidence-based application prioritization, four-tier decisions, skill-gap analysis, job explanations, comparisons, and short action plans from the local Job Market desktop API or supplied CSV, JSON, JSONL, exports, resumes, and profile data. Do not use only to rewrite one resume bullet or to search live openings without analyzing a job sample.
 ---
 
 # Job Market Reality Check
 
-Turn collected job postings plus a user's real evidence into a transparent application plan.
+Turn collected job facts and real user evidence into a transparent application decision.
 
-## Required outcome
+Never describe a score as an offer probability, hiring probability, or trained prediction.
 
-Answer these questions:
+## Select the data mode
 
-1. What role directions and recurring requirements are actually present in the supplied sample?
-2. Which jobs should the user apply to now, stretch for, prepare for first, or defer?
-3. Which hard requirements are satisfied, uncertain, or conflicting?
-4. Which skills are backed by projects, coursework, repositories, or work samples?
-5. What should the user change in their resume, portfolio, and next two weeks of work?
+Prefer one source of truth for each run.
 
-Never present the result as an offer probability, hiring probability, or trained machine-learning prediction.
+### Local desktop API mode
 
-## Inputs
+Use this mode when the Job Market desktop service or repository is available.
 
-Use files already supplied by the user whenever possible. Accept:
+1. Read `references/local-api.md`.
+2. Use `scripts/local_api_client.py`; never open SQLite directly.
+3. Treat desktop decision results as authoritative. Do not run the portable scoring model over the same jobs.
+4. Keep the first integration read-only. Do not call `POST`, `PUT`, `PATCH`, or `DELETE`.
+5. For a current-state brief, read `references/brief-workflow.md`.
 
-- job data in CSV, JSON, JSONL, pasted text, or a local-demo export;
-- a profile JSON, resume, project descriptions, or conversation context;
-- optional human labels: `apply_now`, `stretch`, `prepare_first`, `defer`;
-- optional constraints: target roles, city, internship/full-time, graduation year, salary floor, and unavailable work arrangements.
+The API client only sends credentials to localhost and automatically checks pagination, required fields, and decision-run consistency.
 
-Read `references/input-schema.md` when converting messy inputs.
-Read `references/scoring-model.md` before changing weights or thresholds.
-Read `references/output-contract.md` before drafting the final report.
+### Portable file mode
 
-## Workflow
+Use this mode when the user supplies files, pasted postings, or an export without the desktop service.
 
-### 1. Confirm the decision question
-
-Infer obvious context. Ask only for missing information that materially changes the result:
-
-- target role or role family;
-- internship versus full-time;
-- acceptable locations;
-- education and graduation timing;
-- actual skills and project evidence;
-- non-negotiable constraints.
-
-Do not force the user through a long questionnaire. State assumptions explicitly.
-
-### 2. Qualify the market sample
-
-Report:
-
-- number of usable postings;
-- source and date range when available;
-- duplicates and incomplete rows;
-- missing salary, education, experience, and skill fields;
-- why the sample may not represent the whole market.
-
-Never generalize from a small sample to the entire industry without qualification.
-
-### 3. Normalize jobs and evidence
-
-Prefer the bundled script for repeatability:
+1. Read `references/input-schema.md` when normalizing inputs.
+2. Read `references/scoring-model.md` before changing weights or thresholds.
+3. Run:
 
 ```bash
 python scripts/analyze_job_market.py \
@@ -80,30 +40,23 @@ python scripts/analyze_job_market.py \
   --output-dir <output-directory>
 ```
 
-Add `--labels <labels.json>` when calibration labels exist.
+Add `--labels <labels.json>` when human calibration labels exist.
 
-The script creates:
+The script creates `normalized_jobs.json`, `decision_results.json`, and `report.md`.
 
-- `normalized_jobs.json`;
-- `decision_results.json`;
-- `report.md`.
+## Apply the evidence standard
 
-When scripts cannot run, reproduce the same logic manually and disclose that the result is manual.
+Separate:
 
-### 4. Separate hard requirements from soft preferences
+- direct evidence;
+- transferable evidence;
+- inference;
+- unknown information;
+- real conflicts.
 
-Classify each important requirement as:
+Treat a skill name without project, coursework, repository, or work-sample evidence as weaker than demonstrated competence. Treat missing information as unknown, not satisfied. Never invent experience, metrics, education equivalence, work authorization, availability, or graduation eligibility.
 
-- `satisfied`;
-- `uncertain`;
-- `conflict`;
-- `not_stated`.
-
-Hard conflicts override a high soft-match score. Do not silently assume graduation-year eligibility, work authorization, degree equivalence, experience, or on-site availability.
-
-### 5. Score with evidence
-
-Keep these dimensions separate:
+Keep these dimensions distinct:
 
 - skill match;
 - project evidence;
@@ -112,73 +65,57 @@ Keep these dimensions separate:
 - preparation cost;
 - final application priority.
 
-A skill name without evidence is weaker than a project demonstrating it. Do not invent precision; whole-number scores are enough.
-
-### 6. Apply four action tiers
-
-Use:
+Use the existing four action groups:
 
 - `apply_now`: submit with current materials;
 - `stretch`: worthwhile despite a limited gap;
-- `prepare_first`: promising, but a specific skill or material gap should be addressed first;
+- `prepare_first`: close one specific evidence or material gap first;
 - `defer`: hard conflict, low relevance, or poor opportunity value.
 
-Explain the main reason for every top recommendation and every surprising deferral.
+Explain every top recommendation and every surprising deferral.
 
-### 7. Calibrate honestly
+## Qualify the sample
 
-When human labels are supplied:
+Report:
 
-- compute exact agreement;
-- compute adjacent-tier agreement;
-- inspect the largest disagreements;
-- adjust thresholds only when the pattern is coherent;
-- call it rule calibration, not model training.
+- usable posting count;
+- source and date range when available;
+- duplicates and incomplete rows;
+- important missing fields;
+- why the sample may not represent the whole market.
 
-Never optimize to a tiny label set and claim general predictive accuracy.
+Do not generalize from a personal collection to an entire industry.
 
-### 8. Produce an action report
+## Produce the result
 
-Follow `assets/report-template.md`.
+Read `references/output-contract.md` before drafting a full file-mode report. Follow `assets/report-template.md` when creating a persistent report.
 
 Prioritize:
 
 1. the next jobs to act on;
 2. the evidence to emphasize;
 3. the smallest high-value gaps to close;
-4. the limits of the data.
+4. one best next action;
+5. the limits of the data.
 
 Respond in the user's language.
 
-## Local demo integration
+## Protect local data
 
-When the repository's FastAPI demo is available:
+- Never reveal the API Token or its value.
+- Do not expose database, user-data, project-root, or log paths in the result.
+- Do not persist an API snapshot unless the user explicitly asks for an export.
+- Do not include unnecessary personal profile fields in a shared report.
+- Do not advise mass applying, automatic messaging, or bypassing platform restrictions.
 
-- use it as an optional collector and visualization layer;
-- do not require the Windows installer for skill execution;
-- never expose `api_token.txt`, the SQLite database, personal profile data, or real exports;
-- treat the browser extension as optional, not part of the minimum skill runtime.
+## Final checks
 
-## Gotchas
+Verify:
 
-- High salary does not automatically mean high opportunity value.
-- Keyword overlap is not evidence of competence.
-- `Python/R` and similar alternatives must not be treated as requiring both.
-- A title can conflict with the body; inspect the full description.
-- A high-scoring job can still be `stretch` when evidence is weak.
-- A lower-scoring job can be `apply_now` when preparation cost is near zero.
-- Missing information is `uncertain`, not automatically satisfied.
-- Do not advise mass applying without ranking and batching.
-
-## Final quality checks
-
-Before finishing, verify:
-
-- all counts reconcile;
-- no private token, database path, or personal identifier is exposed;
+- counts reconcile;
+- all compared jobs use one decision run;
 - every top action has a reason;
-- every hard conflict is visible;
-- scores and tiers are internally consistent;
-- recommendations are grounded in supplied data;
-- sample limitations are stated;
-- the user receives a concrete next action, not only analysis.
+- hard conflicts and unknowns remain visible;
+- API-mode results were not rescored;
+- no secret or private path appears;
+- the user receives one concrete next action.

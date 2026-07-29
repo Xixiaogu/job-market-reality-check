@@ -36,10 +36,23 @@ python scripts/analyze_job_market.py \
   --output-dir output
 ```
 
+## Local desktop API
+
+The first read-only integration supports a consistent current-state brief:
+
+```bash
+python scripts/local_api_client.py health
+python scripts/local_api_client.py brief
+```
+
+The client only connects to localhost, uses `GET` requests, validates pagination
+and decision-run consistency, and never opens SQLite directly.
+
 ## Test
 
 ```bash
 python tests/test_skill_workflow.py
+python tests/test_local_api_client.py
 ```
 
 ## Relationship to the local demo

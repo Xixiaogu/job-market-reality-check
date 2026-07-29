@@ -5,6 +5,12 @@
 桌面基线：`desktop-v1.0.7-appearance`  
 冻结日期：`2026-07-29`
 
+Skill 0.1 参考实现：
+
+```text
+skills/job-market-reality-check/scripts/local_api_client.py
+```
+
 ## 1. 目标与边界
 
 本契约固定 Job Market Skill v1 可以读取的本地事实来源。Skill 负责自然语言路由、解释、比较和行动计划，不重新实现 SQLite、岗位管理、档案管理或评分引擎。

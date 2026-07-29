@@ -1,0 +1,4 @@
+interface:
+  display_name: "Job Market Reality Check"
+  short_description: "Rank local job opportunities using real evidence"
+  default_prompt: "Use $job-market-reality-check to create an evidence-based brief from my local job data."

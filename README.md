@@ -10,7 +10,7 @@
 - FastAPI 只监听 `127.0.0.1`，岗位、档案和决策数据保存在本机 SQLite；
 - 决策中心提供 `apply_now`、`stretch`、`prepare_first`、`defer` 四档行动建议；
 - Windows Acrylic 与标准浅色外观已经产品化；
-- 可移植文件型 Skill 已存在，桌面 API 集成型 Skill 尚在开发；
+- 可移植文件型 Skill 已存在；桌面 API 集成已完成 0.1 只读客户端和 `brief` 上下文闭环；
 - 本项目适合作为求职作品集和本地演示产品，尚不是商业级自动求职软件。
 
 ## 产品闭环
@@ -192,6 +192,15 @@ skills\job-market-reality-check
 ```
 
 它可以直接分析 CSV、JSON 或 JSONL 文件。计划中的桌面集成型 Skill 必须复用本地 API，不得直接操作 SQLite。
+
+Skill 0.1 可以在桌面服务运行时读取一致的求职简报上下文：
+
+```powershell
+python .\skills\job-market-reality-check\scripts\local_api_client.py health
+python .\skills\job-market-reality-check\scripts\local_api_client.py brief
+```
+
+客户端只接受本机地址，只发送 `GET` 请求，并检查分页和决策运行一致性。
 
 固定的只读接口、字段、鉴权和版本规则见：
 

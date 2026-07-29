@@ -168,6 +168,9 @@ foreach ($test in $offlineTests) {
 Invoke-PythonTest `
     -Label "skill workflow" `
     -Arguments @("skills\job-market-reality-check\tests\test_skill_workflow.py")
+Invoke-PythonTest `
+    -Label "skill local API client" `
+    -Arguments @("skills\job-market-reality-check\tests\test_local_api_client.py")
 
 $sourceDatabase = Join-Path $script:ProjectRoot "data\job_market.db"
 if (-not (Test-Path -LiteralPath $sourceDatabase)) {
@@ -198,7 +201,8 @@ try {
         "test_phase81c_api.py",
         "test_phase82a_api.py",
         "test_phase82b_api.py",
-        "test_phase82c_api.py"
+        "test_phase82c_api.py",
+        "skills\job-market-reality-check\tests\test_local_api_integration.py"
     )
     foreach ($test in $apiTests) {
         Invoke-PythonTest -Label "API: $test" -Arguments @($test)
