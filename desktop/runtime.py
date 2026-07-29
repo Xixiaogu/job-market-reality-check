@@ -26,11 +26,11 @@ APP_NAME = "JobMarketDecisionSystem"
 SERVICE_NAME = "job-market-reality-check-local-api"
 DEFAULT_PORT = 8765
 TOKEN_MIN_LENGTH = 32
-PIPELINE_SCRIPT_NAMES = (
-    "clean_boss_jobs.py",
-    "analyze_boss_jobs.py",
-    "audit_boss_skills.py",
-    "visualize_boss_jobs_v11.py",
+PIPELINE_STEP_MODULES = (
+    "pipeline.clean_jobs",
+    "pipeline.analyze_jobs",
+    "pipeline.audit_skills",
+    "pipeline.build_dashboard",
 )
 
 
@@ -161,26 +161,25 @@ def migrate_legacy_data(root: Path, user_data: Path) -> dict[str, Any]:
 
 
 # PHASE_92_WINDOWS_PACKAGE
-def run_bundled_script(
-    script_name: str,
+def run_bundled_step(
+    module_name: str,
     *,
-    resource_root: Path,
     user_data: Path,
 ) -> int:
-    if script_name not in PIPELINE_SCRIPT_NAMES:
-        raise RuntimeError(f"不允许执行的分析脚本：{script_name}")
-
-    script_path = resource_root / script_name
-    if not script_path.exists():
-        raise FileNotFoundError(f"缺少分析脚本：{script_path}")
+    if module_name not in PIPELINE_STEP_MODULES:
+        raise RuntimeError(f"不允许执行的分析步骤：{module_name}")
 
     old_cwd = Path.cwd()
     old_argv = sys.argv[:]
     try:
         os.chdir(user_data)
-        sys.argv = [str(script_path)]
+        sys.argv = [module_name]
         try:
-            runpy.run_path(str(script_path), run_name="__main__")
+            runpy.run_module(
+                module_name,
+                run_name="__main__",
+                alter_sys=True,
+            )
         except SystemExit as exc:
             if exc.code in (None, 0):
                 return 0
@@ -321,8 +320,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--no-migrate", action="store_true")
     parser.add_argument("--user-data-dir", type=Path)
     parser.add_argument(
-        "--run-script",
-        choices=PIPELINE_SCRIPT_NAMES,
+        "--run-step",
+        dest="run_step",
+        choices=PIPELINE_STEP_MODULES,
         help=argparse.SUPPRESS,
     )
     return parser
@@ -339,10 +339,9 @@ def main() -> int:
     )
 
     try:
-        if args.run_script:
-            return run_bundled_script(
-                args.run_script,
-                resource_root=Path(context["resource_root"]),
+        if args.run_step:
+            return run_bundled_step(
+                args.run_step,
                 user_data=user_data,
             )
 

@@ -7,7 +7,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$script:ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$script:ProjectRoot = Split-Path -Parent $PSScriptRoot
 $script:Passed = 0
 $script:Python = ""
 

@@ -5,7 +5,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent $PSScriptRoot
 
 if (-not $projectRoot) {
     $projectRoot = (Get-Location).Path

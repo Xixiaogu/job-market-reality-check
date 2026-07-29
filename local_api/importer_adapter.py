@@ -1,26 +1,13 @@
 from __future__ import annotations
 
-import sys
-from pathlib import Path
 from typing import Any
 
-from .config import PROJECT_ROOT
-
-
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
-
-try:
-    from import_extension_jobs import (  # type: ignore
-        clean_text,
-        convert_extension_record,
-        merge_nonempty,
-        validate_extension_record,
-    )
-except ImportError as exc:
-    raise RuntimeError(
-        "无法导入项目根目录下的 import_extension_jobs.py。"
-    ) from exc
+from .extension_import import (
+    clean_text,
+    convert_extension_record,
+    merge_nonempty,
+    validate_extension_record,
+)
 
 
 EMPTY_VALUES = (None, "", [], {})

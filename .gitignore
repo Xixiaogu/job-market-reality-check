@@ -5,6 +5,7 @@
 # Python cache
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
 .ipynb_checkpoints/
 
@@ -48,7 +49,7 @@ local_api/runtime/
 output/local_api/
 # Desktop build and release output
 .build/
-build/
+/build/
 dist/
 /release/
 

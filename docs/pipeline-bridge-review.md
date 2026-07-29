@@ -2,7 +2,7 @@
 
 ## 1. 审查结论
 
-现有浏览器扩展导出的 JSONL 可以接入当前 Python 分析管线，但不能直接作为 `clean_boss_jobs.py` 的输入。
+现有浏览器扩展导出的 JSONL 可以接入当前 Python 分析管线，但不能直接作为 `pipeline/clean_jobs.py` 的输入。
 
 原因是两端字段命名和数据层级不同：
 
@@ -20,12 +20,12 @@
 ```text
 Chrome / Edge 插件
 → 导出 boss-jobs-*.jsonl
-→ import_extension_jobs.py
+→ local_api/extension_import.py
 → output/boss_batch/jobs.jsonl
-→ clean_boss_jobs.py
-→ analyze_boss_jobs.py
-→ audit_boss_skills.py
-→ visualize_boss_jobs_v11.py
+→ pipeline/clean_jobs.py
+→ pipeline/analyze_jobs.py
+→ pipeline/audit_skills.py
+→ pipeline/build_dashboard.py
 → HTML 看板
 ```
 
@@ -130,11 +130,11 @@ job_basic_info_raw =
 ## 7. 本阶段新增文件
 
 ```text
-import_extension_jobs.py
-run_extension_pipeline.ps1
+local_api/extension_import.py
+scripts/run_pipeline.ps1
 ```
 
-`import_extension_jobs.py` 负责：
+`local_api/extension_import.py` 负责：
 
 - 校验扩展 JSONL
 - camelCase 转 snake_case
@@ -144,7 +144,7 @@ run_extension_pipeline.ps1
 - 备份旧输入文件
 - 输出导入报告
 
-`run_extension_pipeline.ps1` 负责一条命令依次运行：
+`scripts/run_pipeline.ps1` 负责一条命令依次运行：
 
 ```text
 导入
@@ -164,7 +164,7 @@ run_extension_pipeline.ps1
 powershell.exe `
     -NoProfile `
     -ExecutionPolicy Bypass `
-    -File ".\run_extension_pipeline.ps1" `
+    -File ".\scripts\run_pipeline.ps1" `
     -InputPath "<DOWNLOAD_DIR>\boss-jobs-20260727-014635.jsonl" `
     -OpenDashboard
 ```
@@ -179,7 +179,7 @@ powershell.exe `
 powershell.exe `
     -NoProfile `
     -ExecutionPolicy Bypass `
-    -File ".\run_extension_pipeline.ps1" `
+    -File ".\scripts\run_pipeline.ps1" `
     -InputPath "<DOWNLOAD_DIR>\boss-jobs-20260727-014635.jsonl" `
     -Replace `
     -OpenDashboard

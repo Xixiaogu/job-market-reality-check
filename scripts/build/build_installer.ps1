@@ -1,7 +1,8 @@
 ﻿param(
-    [string]$ProjectRoot = (Get-Location).Path,
+    [string]$ProjectRoot = "",
     [string]$Version = "1.0.7",
-    [int]$InstallCompilerIfMissing = 1
+    [int]$InstallCompilerIfMissing = 1,
+    [string]$PythonPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -43,7 +44,20 @@ function Convert-VersionQuad([string]$SemanticVersion) {
     return "$SemanticVersion.0"
 }
 
+if (-not $ProjectRoot) {
+    $ProjectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+}
 $root = (Resolve-Path -LiteralPath $ProjectRoot).Path
+if (-not $PythonPath) {
+    $pythonCommand = Get-Command "python.exe" -ErrorAction SilentlyContinue
+    if (-not $pythonCommand) {
+        Fail "Python was not found. Pass -PythonPath with an explicit interpreter."
+    }
+    $PythonPath = $pythonCommand.Source
+}
+if (-not (Test-Path -LiteralPath $PythonPath)) {
+    Fail "Python interpreter was not found: $PythonPath"
+}
 $releaseDir = Join-Path $root ("release\JobMarketDecisionSystem-v" + $Version + "-desktop")
 $releaseExe = Join-Path $releaseDir "JobMarketDecisionSystem.exe"
 $releaseManifest = Join-Path $releaseDir "browser-extension\chrome-mv3\manifest.json"
@@ -128,7 +142,7 @@ $generated = $template.
 )
 
 Write-Host "Checking Python installer test syntax..." -ForegroundColor Cyan
-& python -m py_compile $testPath
+& $PythonPath -m py_compile $testPath
 if ($LASTEXITCODE -ne 0) {
     Fail "Installer test syntax check failed."
 }
@@ -144,7 +158,7 @@ if (-not (Test-Path -LiteralPath $installerPath)) {
 }
 
 Write-Host "Running installer smoke test..." -ForegroundColor Cyan
-& python $testPath --installer $installerPath --expected-version $Version
+& $PythonPath $testPath --installer $installerPath --expected-version $Version
 if ($LASTEXITCODE -ne 0) {
     Fail "Installer smoke test failed."
 }

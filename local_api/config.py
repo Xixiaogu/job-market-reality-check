@@ -154,11 +154,11 @@ EXTENSION_DIR = Path(
     )
 ).resolve()
 
-PIPELINE_SCRIPTS = (
-    "clean_boss_jobs.py",
-    "analyze_boss_jobs.py",
-    "audit_boss_skills.py",
-    "visualize_boss_jobs_v11.py",
+PIPELINE_STEPS = (
+    "pipeline.clean_jobs",
+    "pipeline.analyze_jobs",
+    "pipeline.audit_skills",
+    "pipeline.build_dashboard",
 )
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765

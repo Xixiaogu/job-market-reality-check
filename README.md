@@ -98,14 +98,14 @@ See [the three-minute demo guide](docs/demo-guide.md).
 Requirements: Windows, Python 3.11+, Node.js 22+ and npm.
 
 ```powershell
-python -m pip install -r .\requirements-local-api.txt
+python -m pip install -e ".[desktop]"
 
 Set-Location .\extension
 npm ci
 npm run build
 Set-Location ..
 
-python .\desktop_launcher.py
+python -m desktop.app
 ```
 
 The development API documentation is available at `http://127.0.0.1:8765/docs` while the service is running.
@@ -124,7 +124,7 @@ Then run the same core suite used by GitHub Actions:
 ```powershell
 $python = (Get-Command python.exe).Source
 powershell.exe -NoProfile -ExecutionPolicy Bypass `
-  -File .\run_baseline_tests.ps1 `
+  -File .\scripts\test.ps1 `
   -Version 1.0.7 `
   -PythonPath $python `
   -SourceDatabasePath .build\ci-fixture\job_market.db `
@@ -132,9 +132,9 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -SkipInstaller
 ```
 
-The CI baseline contains 29 test groups across product contracts, offline
+The CI baseline contains 30 test groups across product contracts, offline
 logic, Skill workflows, local API integration and desktop-mode behavior.
-The full 31-group release gate additionally exercises the packaged EXE and
+The full 32-group release gate additionally exercises the packaged EXE and
 installer locally because those artifacts are not built in pull-request CI.
 See [the test-suite guide](tests/README.md) for the directory conventions.
 
@@ -180,13 +180,15 @@ Read [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) before using real d
 
 ```text
 extension/                         browser collector (TypeScript + WXT)
+desktop/                           Windows shell, runtime and native effects
 local_api/                         FastAPI, SQLite and desktop web UI
+pipeline/                          cleaning, analysis, audit and dashboard jobs
 skills/job-market-reality-check/  read-only Agent Skill v0.1.0
 tests/                             contracts, offline, API and release suites
-scripts/create_ci_fixture.py       fictional CI/demo dataset generator
+scripts/                           run, test, fixture and build entry points
 packaging/                         Windows ZIP and installer definitions
 docs/                              architecture, contracts and release notes
-run_baseline_tests.ps1             unified validation entry point
+pyproject.toml                     Python metadata and dependency groups
 ```
 
 </details>

@@ -29,12 +29,12 @@ jobs:
         with:
           python-version: "3.11"
           cache: pip
-          cache-dependency-path: requirements-local-api.txt
+          cache-dependency-path: pyproject.toml
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements-local-api.txt
+          python -m pip install -e .
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -59,7 +59,7 @@ jobs:
         shell: pwsh
         run: |
           $python = (Get-Command python.exe).Source
-          ./run_baseline_tests.ps1 `
+          ./scripts/test.ps1 `
             -Version 1.0.7 `
             -PythonPath $python `
             -SourceDatabasePath .build/ci-fixture/job_market.db `

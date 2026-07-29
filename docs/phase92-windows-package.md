@@ -22,7 +22,7 @@ release/
 
 ## 打包兼容处理
 
-打包模式下，分析流水线不能再使用 `python script.py` 启动，因为 `sys.executable` 已经是桌面 EXE。Phase 9.2 为启动器增加隐藏的 `--run-script` 模式，使分析脚本继续在独立子进程中运行。
+打包模式下，分析流水线不能再使用 `python -m pipeline.<step>` 启动，因为 `sys.executable` 已经是桌面 EXE。启动器提供隐藏的 `--run-step` 模式，使内置分析模块继续在独立子进程中运行。
 
 ## 自动验收
 
@@ -31,6 +31,6 @@ release/
 当前基线构建命令：
 
 ```powershell
-conda activate base_science
-.\build_windows_desktop_shell.ps1 -Version 1.0.7
+python -m pip install -e ".[desktop,build]"
+.\scripts\build\build_desktop.ps1 -Version 1.0.7
 ```

@@ -18,7 +18,7 @@ New scoring dimensions, threshold changes, major UI redesigns and write-capable 
 Use Windows, Python 3.11+, Node.js 22+ and npm:
 
 ```powershell
-python -m pip install -r .\requirements-local-api.txt
+python -m pip install -e ".[desktop]"
 
 Set-Location .\extension
 npm ci
@@ -36,7 +36,7 @@ python .\scripts\create_ci_fixture.py `
   --output .build\ci-fixture\job_market.db
 
 $python = (Get-Command python.exe).Source
-.\run_baseline_tests.ps1 `
+.\scripts\test.ps1 `
   -Version 1.0.7 `
   -PythonPath $python `
   -SourceDatabasePath .build\ci-fixture\job_market.db `

@@ -95,7 +95,7 @@ http://127.0.0.1:8765/docs
 ```powershell
 conda activate base_science
 Set-Location "<PROJECT_ROOT>"
-.\run_local_api.ps1
+.\scripts\run_api.ps1
 ```
 
 服务终端需要保持开启。

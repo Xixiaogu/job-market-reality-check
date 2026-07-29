@@ -85,7 +85,7 @@ def request_json(
         ) from exc
     except urllib.error.URLError as exc:
         raise RuntimeError(
-            "无法连接本地 API。请先运行 run_local_api.ps1。"
+            "无法连接本地 API。请先运行 scripts/run_api.ps1。"
         ) from exc
 
 

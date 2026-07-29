@@ -6,7 +6,7 @@ import os
 from dataclasses import dataclass
 
 from local_api.app_shell import inject_app_shell
-from windows_glass import (
+from desktop.windows_effects import (
     MODE_OFF,
     MODE_SYSTEM,
     WEBVIEW_BACKGROUND_ENV,
@@ -71,8 +71,8 @@ def test_shell_system_glass_injection() -> None:
 
 
 def test_source_markers() -> None:
-    desktop = open("desktop_app.py", encoding="utf-8").read()
-    native = open("windows_glass.py", encoding="utf-8").read()
+    desktop = open("desktop/app.py", encoding="utf-8").read()
+    native = open("desktop/windows_effects.py", encoding="utf-8").read()
     shell = open("local_api/app_shell.py", encoding="utf-8").read()
 
     assert "1.0.7-appearance" in desktop

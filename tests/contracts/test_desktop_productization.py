@@ -22,7 +22,7 @@ def require(condition: bool, message: str) -> None:
 def main() -> None:
     config_text = (ROOT / "local_api" / "config.py").read_text(encoding="utf-8")
     main_text = (ROOT / "local_api" / "main.py").read_text(encoding="utf-8")
-    launcher_text = (ROOT / "desktop_launcher.py").read_text(encoding="utf-8")
+    launcher_text = (ROOT / "desktop" / "runtime.py").read_text(encoding="utf-8")
     setup_text = (ROOT / "local_api" / "setup_ui.py").read_text(encoding="utf-8")
 
     require("PHASE_91_DESKTOP_PRODUCTIZATION" in config_text, "config marker missing")
@@ -48,7 +48,7 @@ def main() -> None:
         (legacy / "local_api" / "runtime" / "api_token.txt").write_text(token, encoding="utf-8")
 
         sys.path.insert(0, str(ROOT))
-        import desktop_launcher
+        from desktop import runtime as desktop_launcher
 
         result = desktop_launcher.migrate_legacy_data(legacy, user_data)
         require(result["database_migrated"], "database migration did not run")
@@ -65,7 +65,8 @@ def main() -> None:
         completed = subprocess.run(
             [
                 sys.executable,
-                str(ROOT / "desktop_launcher.py"),
+                "-m",
+                "desktop.runtime",
                 "--check",
                 "--no-migrate",
                 "--user-data-dir",

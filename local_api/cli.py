@@ -9,7 +9,8 @@ from typing import Any
 from .config import (
     DASHBOARD_PATH,
     DB_PATH,
-    PIPELINE_SCRIPTS,
+    IS_FROZEN,
+    PIPELINE_STEPS,
     PROJECT_ROOT,
     TARGET_JSONL,
     TOKEN_PATH,
@@ -64,12 +65,15 @@ def command_doctor(_: argparse.Namespace) -> int:
         "database_parent": DB_PATH.parent.exists(),
         "token_exists": TOKEN_PATH.exists(),
         "importer_exists": (
-            PROJECT_ROOT / "import_extension_jobs.py"
-        ).exists(),
+            PROJECT_ROOT / "local_api" / "extension_import.py"
+        ).exists() or IS_FROZEN,
         "target_jsonl_exists": TARGET_JSONL.exists(),
-        "pipeline_scripts": {
-            script: (PROJECT_ROOT / script).exists()
-            for script in PIPELINE_SCRIPTS
+        "pipeline_steps": {
+            module: (
+                PROJECT_ROOT
+                / Path(*module.split("."))
+            ).with_suffix(".py").exists() or IS_FROZEN
+            for module in PIPELINE_STEPS
         },
         "dashboard_exists": DASHBOARD_PATH.exists(),
         "job_count": count_jobs(),
@@ -83,7 +87,7 @@ def command_doctor(_: argparse.Namespace) -> int:
         and checks["database_parent"]
         and checks["token_exists"]
         and checks["importer_exists"]
-        and all(checks["pipeline_scripts"].values())
+        and all(checks["pipeline_steps"].values())
     )
     return 0 if required_ok else 2
 

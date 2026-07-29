@@ -421,59 +421,27 @@ OCR 不属于第一版必要功能。
 
 ---
 
-## 13. 当前仓库整理建议
+## 13. 当前仓库结构
 
-当前阶段不要立即移动现有 Python 脚本。
-
-原因：
-
-- 现有脚本可能依赖相对路径
-- 插件开发和 Python 管线重构同时进行，容易引入路径错误
-- 当前首要任务是验证浏览器端采集是否可行
-- 数据协议固定后再统一迁移更稳妥
-
-建议先新增：
+浏览器采集协议稳定后，仓库已按运行职责完成整理：
 
 ```text
 job-market-reality-check/
 ├── extension/                   # Chrome / Edge 扩展
-├── demo/                        # 脱敏演示数据
-├── docs/                        # 架构、截图和开发方案
-│   └── browser-extension-plan.md
-├── tests/                       # Python及后续扩展测试
-├── output/                      # 本地输出，Git忽略
-├── collect_all_boss_jobs.py
-├── extract_current_boss_job.py
-├── clean_boss_jobs.py
-├── analyze_boss_jobs.py
-├── audit_boss_skills.py
-├── visualize_boss_jobs_v11.py
+├── desktop/                     # Windows 桌面外壳与运行时
+├── local_api/                   # FastAPI、SQLite 与导入适配器
+├── pipeline/                    # 清洗、分析、审计与看板
+├── scripts/                     # 启动、测试、构建入口
+├── tests/                       # 契约、离线、API 与发布测试
+├── docs/                        # 架构、协议和开发记录
+├── packaging/                   # Windows 发布定义
+├── output/                      # 本地输出，Git 忽略
+├── pyproject.toml               # Python 依赖与入口
 ├── README.md
-├── base_science_environment.yml
 └── .gitignore
 ```
 
-以下 Python 脚本暂时保留在根目录：
-
-```text
-collect_all_boss_jobs.py
-extract_current_boss_job.py
-clean_boss_jobs.py
-analyze_boss_jobs.py
-audit_boss_skills.py
-visualize_boss_jobs_v11.py
-```
-
-等浏览器插件采集成功、数据协议稳定后，再迁移为：
-
-```text
-pipeline/
-├── collect/
-├── clean/
-├── analyze/
-├── audit/
-└── visualize/
-```
+根目录只保留项目级说明、治理文件和 `pyproject.toml`；运行脚本不再散落在根目录。
 
 ---
 

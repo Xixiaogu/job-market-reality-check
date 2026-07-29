@@ -11,7 +11,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent $PSScriptRoot
 
 if (-not $projectRoot) {
     $projectRoot = (Get-Location).Path
@@ -20,11 +20,11 @@ if (-not $projectRoot) {
 Set-Location $projectRoot
 
 $requiredFiles = @(
-    ".\import_extension_jobs.py",
-    ".\clean_boss_jobs.py",
-    ".\analyze_boss_jobs.py",
-    ".\audit_boss_skills.py",
-    ".\visualize_boss_jobs_v11.py"
+    ".\local_api\extension_import.py",
+    ".\pipeline\clean_jobs.py",
+    ".\pipeline\analyze_jobs.py",
+    ".\pipeline\audit_skills.py",
+    ".\pipeline\build_dashboard.py"
 )
 
 $missingFiles = @(
@@ -71,7 +71,8 @@ $resolvedInput = (
 ).Path
 
 $importArguments = @(
-    ".\import_extension_jobs.py",
+    "-m",
+    "local_api.extension_import",
     "--input",
     $resolvedInput
 )
@@ -89,25 +90,25 @@ Invoke-PipelineStep `
 Invoke-PipelineStep `
     -Name "2/5 清洗岗位字段" `
     -Command {
-        & $PythonExecutable ".\clean_boss_jobs.py"
+        & $PythonExecutable -m pipeline.clean_jobs
     }
 
 Invoke-PipelineStep `
     -Name "3/5 生成基础岗位分析" `
     -Command {
-        & $PythonExecutable ".\analyze_boss_jobs.py"
+        & $PythonExecutable -m pipeline.analyze_jobs
     }
 
 Invoke-PipelineStep `
     -Name "4/5 执行技能证据审计" `
     -Command {
-        & $PythonExecutable ".\audit_boss_skills.py"
+        & $PythonExecutable -m pipeline.audit_skills
     }
 
 Invoke-PipelineStep `
     -Name "5/5 生成可视化看板" `
     -Command {
-        & $PythonExecutable ".\visualize_boss_jobs_v11.py"
+        & $PythonExecutable -m pipeline.build_dashboard
     }
 
 $dashboardPath = Join-Path `

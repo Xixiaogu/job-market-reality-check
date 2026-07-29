@@ -2,7 +2,7 @@
 
 ## 用户流程
 
-1. 启动 `run_local_api.ps1`。
+1. 启动 `scripts/run_api.ps1`。
 2. 打开扩展，把 `local_api/runtime/api_token.txt` 的内容粘贴到令牌框。
 3. 点击“保存并测试”完成一次性配对。
 4. 浏览 BOSS 岗位详情页，点击“采集并同步岗位”。

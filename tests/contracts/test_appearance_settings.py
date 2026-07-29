@@ -67,14 +67,14 @@ def test_user_pages_hide_internal_phase_labels() -> None:
     for label in FORBIDDEN_USER_LABELS:
         assert label not in rendered, label
 
-    dashboard_source = Path("dashboard_ux_v12.py").read_text(encoding="utf-8")
+    dashboard_source = Path("pipeline/dashboard_enhancer.py").read_text(encoding="utf-8")
     shell_source = Path("local_api/app_shell.py").read_text(encoding="utf-8")
     assert "岗位市场分析看板 v1.2" not in dashboard_source
     assert "统一桌面界面 ·" not in shell_source
 
 
 def test_restart_wiring_is_present() -> None:
-    desktop = Path("desktop_app.py").read_text(encoding="utf-8")
+    desktop = Path("desktop/app.py").read_text(encoding="utf-8")
     main = Path("local_api/main.py").read_text(encoding="utf-8-sig")
     assert "restart-app.request" in desktop
     assert "relaunch_current_process" in desktop

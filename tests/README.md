@@ -25,11 +25,11 @@ python .\scripts\create_ci_fixture.py `
   --output .build\ci-fixture\job_market.db
 ```
 
-Then run the same 29 test groups used by GitHub Actions:
+Then run the same 30 test groups used by GitHub Actions:
 
 ```powershell
 $python = (Get-Command python.exe).Source
-.\run_baseline_tests.ps1 `
+.\scripts\test.ps1 `
   -Version 1.0.7 `
   -PythonPath $python `
   -SourceDatabasePath .build\ci-fixture\job_market.db `
@@ -37,7 +37,7 @@ $python = (Get-Command python.exe).Source
   -SkipInstaller
 ```
 
-Omit `-SkipPackaged` and `-SkipInstaller` to run the full 31-group release
+Omit `-SkipPackaged` and `-SkipInstaller` to run the full 32-group release
 gate after the v1.0.7 artifacts have been built.
 
 The runner discovers `test_*.py` files in each category automatically.

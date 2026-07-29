@@ -1,6 +1,7 @@
 ﻿param(
-    [string]$ProjectRoot = (Get-Location).Path,
-    [string]$Version = "1.0.0"
+    [string]$ProjectRoot = "",
+    [string]$Version = "1.0.7",
+    [string]$PythonPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -11,26 +12,44 @@ function Fail([string]$Message) {
     exit 1
 }
 
+if (-not $ProjectRoot) {
+    $ProjectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+}
 $root = (Resolve-Path -LiteralPath $ProjectRoot).Path
+if (-not $PythonPath) {
+    $pythonCommand = Get-Command "python.exe" -ErrorAction SilentlyContinue
+    if (-not $pythonCommand) {
+        Fail "Python was not found. Pass -PythonPath with an explicit interpreter."
+    }
+    $PythonPath = $pythonCommand.Source
+}
+if (-not (Test-Path -LiteralPath $PythonPath)) {
+    Fail "Python interpreter was not found: $PythonPath"
+}
 
-if ($env:CONDA_DEFAULT_ENV -ne "base_science") {
-    Fail "Activate the base_science Conda environment before building. Current environment: $env:CONDA_DEFAULT_ENV"
+if ($Version -notmatch '^\d+\.\d+\.\d+$') {
+    Fail "Version must use semantic format such as 1.0.1."
 }
 
 $requiredFiles = @(
-    "desktop_launcher.py",
+    "desktop\app.py",
+    "desktop\runtime.py",
     "local_api\main.py",
     "local_api\pipeline.py",
-    "job_market_decision_system.spec",
-    "packaging\windows_version_info.txt",
+    "packaging\pyinstaller\desktop.spec",
+    "packaging\generate_branding.py",
+    "packaging\branding\app_icon.ico",
+    "packaging\branding\app_icon.png",
+    "tests\contracts\test_desktop_shell.py",
+    "tests\contracts\test_desktop_productization.py",
     "tests\release\test_portable_package_smoke.py",
     "packaging\README_FIRST.txt",
     "packaging\浏览器扩展安装说明.txt",
     "packaging\数据与隐私说明.txt",
-    "clean_boss_jobs.py",
-    "analyze_boss_jobs.py",
-    "audit_boss_skills.py",
-    "visualize_boss_jobs_v11.py"
+    "pipeline\clean_jobs.py",
+    "pipeline\analyze_jobs.py",
+    "pipeline\audit_skills.py",
+    "pipeline\build_dashboard.py"
 )
 
 foreach ($relativePath in $requiredFiles) {
@@ -53,29 +72,36 @@ if (-not $extensionDir) {
     Fail "No built Chrome Manifest V3 extension was found."
 }
 
-Write-Host "Checking PyInstaller..." -ForegroundColor Cyan
-& python -c "import PyInstaller; print('PyInstaller', PyInstaller.__version__)"
+Write-Host "Checking desktop-shell dependencies..." -ForegroundColor Cyan
+& $PythonPath -c "import webview, pystray, PIL, PyInstaller; print('pywebview', webview.__version__ if hasattr(webview, '__version__') else 'installed'); print('pystray installed'); print('Pillow', PIL.__version__); print('PyInstaller', PyInstaller.__version__)"
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "PyInstaller is not installed. Installing it in base_science..." -ForegroundColor Yellow
-    & python -m pip install pyinstaller
-    if ($LASTEXITCODE -ne 0) {
-        Fail "PyInstaller installation failed."
-    }
+    Fail "Desktop-shell Python dependencies are missing."
+}
+
+Write-Host "Regenerating product icon..." -ForegroundColor Cyan
+& $PythonPath (Join-Path $root "packaging\generate_branding.py")
+if ($LASTEXITCODE -ne 0) {
+    Fail "Branding generation failed."
 }
 
 Write-Host "Running source syntax checks..." -ForegroundColor Cyan
-& python -m py_compile `
-    (Join-Path $root "desktop_launcher.py") `
-    (Join-Path $root "local_api\pipeline.py") `
-    (Join-Path $root "tests\release\test_portable_package_smoke.py")
+& $PythonPath -m py_compile `
+    (Join-Path $root "desktop\app.py") `
+    (Join-Path $root "desktop\runtime.py") `
+    (Join-Path $root "tests\contracts\test_desktop_shell.py")
 if ($LASTEXITCODE -ne 0) {
     Fail "Python syntax check failed."
 }
 
-Write-Host "Running desktop productization contract tests..." -ForegroundColor Cyan
+Write-Host "Running desktop-shell source tests..." -ForegroundColor Cyan
 Push-Location $root
 try {
-    & python -m tests.contracts.test_desktop_productization
+    & $PythonPath -m tests.contracts.test_desktop_shell
+    if ($LASTEXITCODE -ne 0) {
+        Fail "Desktop-shell source tests failed."
+    }
+
+    & $PythonPath -m tests.contracts.test_desktop_productization
     if ($LASTEXITCODE -ne 0) {
         Fail "Desktop productization contract tests failed."
     }
@@ -84,21 +110,65 @@ finally {
     Pop-Location
 }
 
-$buildRoot = Join-Path $root ".build\phase92"
+$parts = $Version.Split(".")
+$quad = "$($parts[0]), $($parts[1]), $($parts[2]), 0"
+$versionInfo = @"
+# UTF-8
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=($quad),
+    prodvers=($quad),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo(
+      [
+        StringTable(
+          u'080404B0',
+          [
+            StringStruct(u'CompanyName', u'Job Market Reality Check'),
+            StringStruct(u'FileDescription', u'招聘市场分析与投递决策系统'),
+            StringStruct(u'FileVersion', u'$Version'),
+            StringStruct(u'InternalName', u'JobMarketDecisionSystem'),
+            StringStruct(u'LegalCopyright', u'Copyright (c) 2026'),
+            StringStruct(u'OriginalFilename', u'JobMarketDecisionSystem.exe'),
+            StringStruct(u'ProductName', u'招聘市场分析与投递决策系统'),
+            StringStruct(u'ProductVersion', u'$Version')
+          ]
+        )
+      ]
+    ),
+    VarFileInfo([VarStruct(u'Translation', [2052, 1200])])
+  ]
+)
+"@
+$versionInfoPath = Join-Path $root "packaging\windows_version_info_shell.txt"
+[System.IO.File]::WriteAllText(
+    $versionInfoPath,
+    $versionInfo,
+    [System.Text.UTF8Encoding]::new($true)
+)
+
+$buildRoot = Join-Path $root ".build\desktop-shell"
 $distRoot = Join-Path $buildRoot "dist"
 $workRoot = Join-Path $buildRoot "work"
 $releaseRoot = Join-Path $root "release"
-$releaseName = "JobMarketDecisionSystem-v$Version"
+$releaseName = "JobMarketDecisionSystem-v$Version-desktop"
 $releaseDir = Join-Path $releaseRoot $releaseName
 $zipPath = Join-Path $releaseRoot ($releaseName + "-windows-x64.zip")
 $hashPath = $zipPath + ".sha256"
 
 if (Test-Path -LiteralPath $releaseDir) {
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $backupDir = Join-Path $root ("local-backups\phase92-previous-release-" + $timestamp)
+    $backupDir = Join-Path $root ("local-backups\desktop-shell-previous-release-" + $timestamp)
     New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
     Move-Item -LiteralPath $releaseDir -Destination $backupDir -Force
-    Write-Host "Previous release moved to: $backupDir" -ForegroundColor Yellow
+    Write-Host "Previous desktop-shell release moved to: $backupDir" -ForegroundColor Yellow
 }
 
 Remove-Item -LiteralPath $buildRoot -Recurse -Force -ErrorAction SilentlyContinue
@@ -109,26 +179,24 @@ New-Item -ItemType Directory -Path $workRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $releaseRoot -Force | Out-Null
 
 $env:JOB_MARKET_BUILD_ROOT = $root
-$env:JOB_MARKET_BUILD_VERSION = $Version
 
-Write-Host "Building Windows onedir release..." -ForegroundColor Cyan
+Write-Host "Building native desktop-shell release..." -ForegroundColor Cyan
 Push-Location $root
 try {
-    & python -m PyInstaller `
+    & $PythonPath -m PyInstaller `
         --noconfirm `
         --clean `
         --distpath $distRoot `
         --workpath $workRoot `
-        (Join-Path $root "job_market_decision_system.spec")
+        (Join-Path $root "packaging\pyinstaller\desktop.spec")
 
     if ($LASTEXITCODE -ne 0) {
-        Fail "PyInstaller build failed."
+        Fail "PyInstaller desktop-shell build failed."
     }
 }
 finally {
     Pop-Location
     Remove-Item Env:\JOB_MARKET_BUILD_ROOT -ErrorAction SilentlyContinue
-    Remove-Item Env:\JOB_MARKET_BUILD_VERSION -ErrorAction SilentlyContinue
 }
 
 $builtDir = Join-Path $distRoot "JobMarketDecisionSystem"
@@ -149,13 +217,16 @@ New-Item -ItemType Directory -Path $releaseDocs -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $root "packaging\README_FIRST.txt") -Destination (Join-Path $releaseDir "README_FIRST.txt") -Force
 Copy-Item -LiteralPath (Join-Path $root "packaging\浏览器扩展安装说明.txt") -Destination $releaseDocs -Force
 Copy-Item -LiteralPath (Join-Path $root "packaging\数据与隐私说明.txt") -Destination $releaseDocs -Force
+Copy-Item -LiteralPath (Join-Path $root "packaging\branding\app_icon.png") -Destination $releaseDocs -Force
 
 $versionPayload = [ordered]@{
     product = "JobMarketDecisionSystem"
     display_name = "招聘市场分析与投递决策系统"
     version = $Version
     platform = "windows-x64"
-    package_mode = "pyinstaller-onedir"
+    package_mode = "pyinstaller-onedir-pywebview"
+    desktop_shell = "pywebview-edgechromium"
+    system_tray = $true
     built_at = (Get-Date).ToString("o")
     extension_manifest_version = 3
 }
@@ -175,10 +246,10 @@ if ($forbidden) {
     Fail "Private runtime files were found in the release:`n$paths"
 }
 
-Write-Host "Running packaged release smoke test..." -ForegroundColor Cyan
+Write-Host "Running packaged headless smoke test..." -ForegroundColor Cyan
 Push-Location $root
 try {
-    & python -m tests.release.test_portable_package_smoke `
+    & $PythonPath -m tests.release.test_portable_package_smoke `
         --release-dir $releaseDir
     if ($LASTEXITCODE -ne 0) {
         Fail "Packaged release smoke test failed."
@@ -188,11 +259,11 @@ finally {
     Pop-Location
 }
 
-Write-Host "Creating ZIP release..." -ForegroundColor Cyan
+Write-Host "Creating desktop-shell ZIP release..." -ForegroundColor Cyan
 Compress-Archive -LiteralPath $releaseDir -DestinationPath $zipPath -CompressionLevel Optimal -Force
 
 if (-not (Test-Path -LiteralPath $zipPath)) {
-    Fail "Release ZIP was not created."
+    Fail "Desktop-shell ZIP was not created."
 }
 
 $hash = Get-FileHash -LiteralPath $zipPath -Algorithm SHA256
@@ -200,7 +271,8 @@ $hash = Get-FileHash -LiteralPath $zipPath -Algorithm SHA256
     Set-Content -LiteralPath $hashPath -Encoding ASCII
 
 Write-Host ""
-Write-Host "Phase 9.2 Windows release build passed." -ForegroundColor Green
+Write-Host "Desktop shell release build passed." -ForegroundColor Green
 Write-Host "Release directory: $releaseDir"
+Write-Host "Executable: $releaseDir\JobMarketDecisionSystem.exe"
 Write-Host "ZIP package: $zipPath"
 Write-Host "SHA256: $hashPath"
