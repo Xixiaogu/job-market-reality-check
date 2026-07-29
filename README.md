@@ -91,7 +91,7 @@ logic.
 
 ## Product workflow
 
-[View Job Market Reality Check Pipeline](docs/assets/job_market_reality_check_pipeline.pdf)
+![Job Market Reality Check Pipeline](docs/assets/job_market_reality_check_pipeline.png)
 
 The ingestion boundary is intentionally narrow in v1.0.7: only manually
 triggered capture from supported BOSS直聘 job-detail pages enters the
