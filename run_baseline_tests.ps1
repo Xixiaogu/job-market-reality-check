@@ -157,8 +157,30 @@ function Assert-TestPortAvailable {
     }
 }
 
+function Get-TestScripts {
+    param([string]$RelativeDirectory)
+
+    $directory = Join-Path $script:ProjectRoot $RelativeDirectory
+    if (-not (Test-Path -LiteralPath $directory)) {
+        throw "Test directory was not found: $directory"
+    }
+
+    return @(
+        Get-ChildItem -LiteralPath $directory -Filter "test_*.py" -File |
+            Sort-Object Name |
+            ForEach-Object { $_.FullName }
+    )
+}
+
 Set-Location -LiteralPath $script:ProjectRoot
 $env:PYTHONUTF8 = "1"
+$pathSeparator = [IO.Path]::PathSeparator
+$env:PYTHONPATH = if ($env:PYTHONPATH) {
+    "$script:ProjectRoot$pathSeparator$env:PYTHONPATH"
+}
+else {
+    $script:ProjectRoot
+}
 $script:Python = Resolve-ProjectPython
 Assert-TestPortAvailable
 
@@ -167,22 +189,8 @@ Write-Host "Python: $script:Python"
 Write-Host "Version: $Version"
 
 $offlineTests = @(
-    "test_appearance_ui_productization.py",
-    "test_auto_refresh_decision.py",
-    "test_desktop_shell.py",
-    "test_market_dashboard_integration.py",
-    "test_phase7b1_offline.py",
-    "test_phase7b2_offline.py",
-    "test_phase81_offline.py",
-    "test_phase81b_offline.py",
-    "test_phase81c_extension.py",
-    "test_phase81c_offline.py",
-    "test_phase82a_offline.py",
-    "test_phase82b_offline.py",
-    "test_phase82c_offline.py",
-    "test_phase91_offline.py",
-    "test_unified_app_shell.py",
-    "test_windows_glass_experiment.py"
+    Get-TestScripts -RelativeDirectory "tests\contracts"
+    Get-TestScripts -RelativeDirectory "tests\offline"
 )
 
 foreach ($test in $offlineTests) {
@@ -228,16 +236,10 @@ try {
     Wait-Api -Job $developmentJob
 
     $apiTests = @(
-        "test_local_api.py",
-        "test_phase7b1_api.py",
-        "test_phase7b2_api.py",
-        "test_phase81_api.py",
-        "test_phase81b_api.py",
-        "test_phase81c_api.py",
-        "test_phase82a_api.py",
-        "test_phase82b_api.py",
-        "test_phase82c_api.py",
-        "skills\job-market-reality-check\tests\test_local_api_integration.py"
+        Get-TestScripts -RelativeDirectory "tests\api\development"
+        Join-Path $script:ProjectRoot (
+            "skills\job-market-reality-check\tests\test_local_api_integration.py"
+        )
     )
     foreach ($test in $apiTests) {
         Invoke-PythonTest -Label "API: $test" -Arguments @($test)
@@ -261,7 +263,13 @@ try {
         -AppMode "desktop" `
         -UserDataPath $desktopRoot
     Wait-Api -Job $desktopJob
-    Invoke-PythonTest -Label "desktop API mode" -Arguments @("test_phase91_api.py")
+    Invoke-PythonTest `
+        -Label "desktop API mode" `
+        -Arguments @(
+            Join-Path $script:ProjectRoot (
+                "tests\api\desktop\test_desktop_mode_api.py"
+            )
+        )
 }
 finally {
     Stop-IsolatedApi -Job $desktopJob
@@ -275,7 +283,13 @@ $releaseDir = Join-Path $script:ProjectRoot (
 if (-not $SkipPackaged) {
     Invoke-PythonTest `
         -Label "packaged desktop smoke" `
-        -Arguments @("test_phase92_release.py", "--release-dir", $releaseDir)
+        -Arguments @(
+            (Join-Path $script:ProjectRoot (
+                "tests\release\test_portable_package_smoke.py"
+            )),
+            "--release-dir",
+            $releaseDir
+        )
 }
 
 if (-not $SkipInstaller) {
@@ -285,7 +299,9 @@ if (-not $SkipInstaller) {
     Invoke-PythonTest `
         -Label "installer smoke" `
         -Arguments @(
-            "test_phase93_installer.py",
+            (Join-Path $script:ProjectRoot (
+                "tests\release\test_installer_smoke.py"
+            )),
             "--installer",
             $installer,
             "--expected-version",
@@ -294,5 +310,5 @@ if (-not $SkipInstaller) {
 }
 
 Write-Host ""
-Write-Host "Baseline test suite passed: $script:Passed checks." -ForegroundColor Green
+Write-Host "Baseline test suite passed: $script:Passed test groups." -ForegroundColor Green
 Write-Host "Isolated test artifacts: $testRoot"

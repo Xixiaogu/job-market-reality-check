@@ -14,8 +14,12 @@ $managementUiPath = Join-Path $projectRoot "local_api\management_ui.py"
 $visualizerPath = Join-Path $projectRoot "visualize_boss_jobs_v11.py"
 $dashboardLinkPath = Join-Path $projectRoot "dashboard_management_link_v13.py"
 $dashboardPath = Join-Path $projectRoot "output\visualization_v1_1\visual_dashboard_v11.html"
-$offlineTestPath = Join-Path $projectRoot "test_phase7b2_offline.py"
-$apiTestPath = Join-Path $projectRoot "test_phase7b2_api.py"
+$offlineTestPath = Join-Path $projectRoot (
+    "tests\offline\test_job_management_ui.py"
+)
+$apiTestPath = Join-Path $projectRoot (
+    "tests\api\development\test_job_management_page_api.py"
+)
 $docPath = Join-Path $projectRoot "docs\phase7b2-management-ui.md"
 
 function Write-Base64File {
@@ -221,8 +225,8 @@ python -m py_compile `
     ".\local_api\database.py" `
     ".\dashboard_management_link_v13.py" `
     ".\visualize_boss_jobs_v11.py" `
-    ".\test_phase7b2_offline.py" `
-    ".\test_phase7b2_api.py"
+    ".\tests\offline\test_job_management_ui.py" `
+    ".\tests\api\development\test_job_management_page_api.py"
 
 if ($LASTEXITCODE -ne 0) {
     throw "Python syntax check failed."
@@ -230,7 +234,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "`n[5/7] Running isolated UI and export tests..." -ForegroundColor Yellow
 
-python ".\test_phase7b2_offline.py"
+python -m tests.offline.test_job_management_ui
 
 if ($LASTEXITCODE -ne 0) {
     throw "Phase 7B.2 offline smoke test failed."
@@ -283,6 +287,9 @@ Write-Host "1. Start run_local_api.ps1."
 Write-Host "2. Open http://127.0.0.1:8765/manage."
 Write-Host "3. Paste the API token once and connect."
 Write-Host "4. Test status editing, notes, archive and bulk actions."
-Write-Host "5. Run python .\test_phase7b2_api.py in another window."
+Write-Host (
+    "5. Run python -m " +
+    "tests.api.development.test_job_management_page_api in another window."
+)
 Write-Host ""
 Write-Host "The browser extension collection flow was not changed."

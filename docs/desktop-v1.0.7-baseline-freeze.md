@@ -43,7 +43,7 @@
 2. v1.0.7 ZIP SHA256 与发布文件一致；
 3. v1.0.7 打包 EXE smoke test 通过；
 4. v1.0.7 安装、启动检查、卸载和用户数据保留 smoke test 通过；
-5. `run_baseline_tests.ps1` 的核心离线、API、桌面和 Skill 检查全部通过；
+5. `run_baseline_tests.ps1` 的契约、离线、API、桌面和 Skill 测试组全部通过；
 6. 根 README 与当前产品一致；
 7. `skill-v1-local-api-contract.md` 已冻结；
 8. 未修改桌面评分权重、阈值或 UI 产品逻辑。

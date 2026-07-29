@@ -108,7 +108,7 @@ Set-Location "<PROJECT_ROOT>"
 conda activate base_science
 Set-Location "<PROJECT_ROOT>"
 
-python .\test_local_api.py `
+python -m tests.api.development.test_pipeline_api `
     --input "<DOWNLOAD_DIR>\boss-jobs-20260727-024416.jsonl" `
     --run-pipeline `
     --open-dashboard

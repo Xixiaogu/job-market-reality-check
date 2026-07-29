@@ -26,7 +26,7 @@ release/
 
 ## 自动验收
 
-构建完成后，`test_phase92_release.py` 会使用随机端口和隔离的临时用户目录启动打包后的 EXE，检查健康接口、桌面状态、浏览器扩展目录、SQLite 初始化、设置页和决策页。
+构建完成后，`tests/release/test_portable_package_smoke.py` 会使用随机端口和隔离的临时用户目录启动打包后的 EXE，检查健康接口、桌面状态、浏览器扩展目录、SQLite 初始化、设置页和决策页。
 
 当前基线构建命令：
 

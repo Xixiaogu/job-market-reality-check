@@ -50,7 +50,7 @@ output/local_api/
 .build/
 build/
 dist/
-release/
+/release/
 
 # Local backups and runtime artifacts
 phase91_offline_error.txt

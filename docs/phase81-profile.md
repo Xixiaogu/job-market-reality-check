@@ -50,13 +50,13 @@ Phase 8.1 为后续可解释投递优先级提供用户侧数据，不进行岗�
 安装后先重启本地 API，再运行：
 
 ```powershell
-python .\test_phase81_api.py
+python -m tests.api.development.test_candidate_profile_api
 ```
 
 离线数据层测试：
 
 ```powershell
-python .\test_phase81_offline.py
+python -m tests.offline.test_candidate_profile
 ```
 
 ## Phase 8.1 边界
