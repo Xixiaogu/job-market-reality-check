@@ -4,8 +4,8 @@
 
 ```text
 release/installer/
-├─ JobMarketDecisionSystem-Setup-v1.0.0.exe
-└─ JobMarketDecisionSystem-Setup-v1.0.0.exe.sha256
+├─ JobMarketDecisionSystem-Setup-v1.0.7.exe
+└─ JobMarketDecisionSystem-Setup-v1.0.7.exe.sha256
 ```
 
 ## 安装行为
@@ -26,3 +26,19 @@ release/installer/
 2. 打包后的启动器自检通过；
 3. 静默卸载成功；
 4. 用户数据哨兵文件在卸载后仍保留。
+
+安装器必须从同版本桌面目录构建：
+
+```text
+release\JobMarketDecisionSystem-v1.0.7-desktop
+```
+
+构建脚本会同时核对 `version.json`，避免把旧桌面目录封装进新版本安装器：
+
+```powershell
+conda activate base_science
+.\build_windows_installer.ps1 -Version 1.0.7
+```
+
+smoke test 会执行真实的当前用户静默安装，因此需要写入开始菜单和
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall`。受限沙箱需要明确授权该操作。

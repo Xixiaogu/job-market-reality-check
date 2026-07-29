@@ -31,7 +31,7 @@ def main() -> None:
     with urllib.request.urlopen(BASE_URL + "/calibrate", timeout=15) as response:
         html = response.read().decode("utf-8")
         assert response.status == 200
-        assert "投递决策人工校准" in html
+        assert "投递决策校准" in html
 
     status, sample = request("/api/v1/calibration/representatives")
     assert status == 200

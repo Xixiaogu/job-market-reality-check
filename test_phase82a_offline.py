@@ -42,7 +42,7 @@ def add_job(db_path: Path, **record) -> str:
 def main() -> None:
     html = render_calibration_page()
     for marker in (
-        "投递决策人工校准",
+        "投递决策校准",
         "/api/v1/calibration/representatives",
         "立即投递",
         "值得冲刺",

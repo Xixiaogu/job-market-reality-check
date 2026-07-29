@@ -8,7 +8,7 @@
 
 ```text
 release/
-├─ JobMarketDecisionSystem-v1.0.0/
+├─ JobMarketDecisionSystem-v1.0.7-desktop/
 │  ├─ JobMarketDecisionSystem.exe
 │  ├─ _internal/
 │  ├─ browser-extension/
@@ -16,8 +16,8 @@ release/
 │  ├─ docs/
 │  ├─ README_FIRST.txt
 │  └─ version.json
-├─ JobMarketDecisionSystem-v1.0.0-windows-x64.zip
-└─ JobMarketDecisionSystem-v1.0.0-windows-x64.zip.sha256
+├─ JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip
+└─ JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip.sha256
 ```
 
 ## 打包兼容处理
@@ -27,3 +27,10 @@ release/
 ## 自动验收
 
 构建完成后，`test_phase92_release.py` 会使用随机端口和隔离的临时用户目录启动打包后的 EXE，检查健康接口、桌面状态、浏览器扩展目录、SQLite 初始化、设置页和决策页。
+
+当前基线构建命令：
+
+```powershell
+conda activate base_science
+.\build_windows_desktop_shell.ps1 -Version 1.0.7
+```

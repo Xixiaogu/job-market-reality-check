@@ -12,7 +12,7 @@ from local_api.profile import (
     patch_profile,
     profile_options,
 )
-from local_api.profile_ui import PAGE_VERSION, render_profile_page
+from local_api.profile_ui import render_profile_page
 
 
 def main() -> None:
@@ -56,12 +56,11 @@ def main() -> None:
             "我的能力",
             "我的项目",
             "求职目标",
-            "PHASE_81B_LOW_FRICTION_PROFILE_UI",
         )
-        # Marker lives in Python source, while visible UI fragments live in HTML.
-        for fragment in required_fragments[:-1]:
+        for fragment in required_fragments:
             assert fragment in html, fragment
-        assert PAGE_VERSION == "8.1B"
+        assert "PHASE_" not in html
+        assert "Phase " not in html
 
     print("Phase 8.1B low-friction profile offline test passed.")
 

@@ -1,126 +1,220 @@
 # Job Market Reality Check
 
-一个面向个人求职决策的招聘岗位分析工具。
+一个本地优先的求职决策桌面系统。它把浏览器岗位采集、本地数据管理、市场分析、个人档案、人工校准、岗位优先级判断和投递状态跟踪连接成完整闭环。
 
-项目从个人收藏的招聘岗位出发，完成岗位信息整理、字段清洗、技能证据提取、异常文本审计和可视化展示，帮助快速看清自己关注的岗位方向、常见技能要求、薪资范围和实习条件。
+当前桌面基线版本为 **v1.0.7**。桌面业务逻辑与评分引擎已冻结，后续主线是在稳定的本地 API 上开发只读 Job Market Skill。
 
-## 项目成果
+## 当前状态
 
-当前版本已完成：
+- Windows 桌面程序、ZIP 发布包和浏览器扩展已经可用；
+- FastAPI 只监听 `127.0.0.1`，岗位、档案和决策数据保存在本机 SQLite；
+- 决策中心提供 `apply_now`、`stretch`、`prepare_first`、`defer` 四档行动建议；
+- Windows Acrylic 与标准浅色外观已经产品化；
+- 可移植文件型 Skill 已存在，桌面 API 集成型 Skill 尚在开发；
+- 本项目适合作为求职作品集和本地演示产品，尚不是商业级自动求职软件。
 
-- 招聘岗位信息结构化整理
-- 薪资、城市、学历、招聘类型和实习要求清洗
-- Python、SQL、机器学习、LLM、RAG、AI Agent 等技能识别
-- 保存每项技能对应的原始 JD 证据
-- 区分必备、优先、岗位职责和普通提及
-- 标记低信息密度岗位和疑似模板残留文本
-- 生成 13 张统计图表
-- 生成可搜索、可筛选的单文件 HTML 看板
-
-## 当前样本结果
-
-本次测试共整理 23 条个人收藏岗位，其中 22 条进入核心分析样本。
-
-| 指标 | 结果 |
-|---|---:|
-| 核心样本 | 22 条 |
-| 实习相关岗位 | 18 条 |
-| Python 覆盖率 | 86.4% |
-| 数据分析覆盖率 | 59.1% |
-| SQL 覆盖率 | 50.0% |
-| 大模型 / LLM 覆盖率 | 45.5% |
-| 日薪区间中点中位数 | 225 元/天 |
-| 月薪区间中点中位数 | 12.5K/月 |
-
-这些结果只描述当前个人收藏样本，不代表整个招聘市场。
-
-## 分析流程
+## 产品闭环
 
 ```text
-岗位链接
-→ 岗位信息采集
-→ 字段清洗
-→ 技能证据提取
-→ 异常样本审计
-→ 描述性统计
-→ HTML 可视化看板
+招聘网页
+  → 浏览器扩展采集
+  → 本地 FastAPI
+  → SQLite 事实与状态
+  → 市场分析与个人档案
+  → 人工校准
+  → 可解释岗位决策
+  → 投递队列与状态跟踪
 ```
 
-## 主要文件
+职责边界：
 
-| 文件 | 作用 |
+| 组件 | 职责 |
 |---|---|
-| `collect_all_boss_jobs.py` | 批量采集岗位信息 |
-| `clean_boss_jobs.py` | 清洗薪资、城市、学历和实习要求等字段 |
-| `analyze_boss_jobs.py` | 生成基础岗位统计和技能频率 |
-| `audit_boss_skills.py` | 保存技能证据并审计异常样本 |
-| `visualize_boss_jobs_v11.py` | 生成图表和可筛选 HTML 看板 |
-| `base_science_environment.yml` | Conda 环境配置 |
+| 浏览器扩展 | 从招聘页面采集岗位并发送到本机 |
+| FastAPI + SQLite | 保存岗位事实、个人档案、人工状态和决策结果 |
+| 桌面程序 | 统一展示岗位管理、市场分析、档案、校准、决策和设置 |
+| Job Market Skill | 读取事实，生成解释、比较和行动计划；不重复实现数据库与评分引擎 |
 
-## 运行方法
+## 主要能力
 
-创建并进入环境：
+- BOSS 直聘岗位页面采集和本地去重；
+- 岗位列表、详情、归档、备注和投递状态管理；
+- 薪资、城市、学历、招聘类型、技能要求和异常文本清洗；
+- 市场样本统计与可筛选分析看板；
+- 个人技能、项目证据、求职方向和地点约束档案；
+- 代表岗位人工校准；
+- 可解释的岗位匹配、机会价值、准备成本和风险分析；
+- 四档投递优先级和待办队列；
+- 分析自动刷新与决策重算；
+- 标准浅色和 Windows Acrylic 外观；
+- Windows 独立程序、ZIP 发布包和安装程序。
+
+## 直接使用 Windows 版本
+
+### 安装程序
+
+运行：
+
+```text
+release\installer\JobMarketDecisionSystem-Setup-v1.0.7.exe
+```
+
+安装程序按当前用户安装，不要求管理员权限。卸载程序不会删除用户数据。
+
+### 免安装 ZIP
+
+解压：
+
+```text
+release\JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip
+```
+
+然后双击：
+
+```text
+JobMarketDecisionSystem.exe
+```
+
+首次启动后，在“扩展与设置”中按照提示加载：
+
+```text
+browser-extension\chrome-mv3
+```
+
+## 用户数据与安全
+
+桌面模式的用户数据默认位于：
+
+```text
+%LOCALAPPDATA%\JobMarketDecisionSystem
+├─ data\job_market.db
+├─ runtime\api_token.txt
+├─ logs\app.log
+├─ exports\
+└─ backups\
+```
+
+- 本地服务只监听 `127.0.0.1:8765`；
+- 除健康接口外，API 需要 `X-Job-Market-Token` 请求头；
+- 发布包不包含开发者的数据库、令牌、岗位导出或个人档案；
+- 不要提交或分享 `api_token.txt`；
+- 替换程序目录或升级版本不会覆盖用户数据。
+
+## 开发模式
+
+推荐使用项目环境：
 
 ```powershell
-conda env create -f base_science_environment.yml
 conda activate base_science
+python -m pip install -r .\requirements-local-api.txt
 ```
 
-依次运行：
+启动本地 API 与浏览器界面：
 
 ```powershell
-python .\collect_all_boss_jobs.py
-python .\clean_boss_jobs.py
-python .\analyze_boss_jobs.py
-python .\audit_boss_skills.py
-python .\visualize_boss_jobs_v11.py
+.\run_local_api.ps1
 ```
 
-打开最终看板：
+启动桌面模式：
 
 ```powershell
-Start-Process .\output\visualization_v1_1\visual_dashboard_v11.html
+python .\desktop_launcher.py
 ```
 
-## 输出内容
-
-主要输出位于：
+开发模式 API 文档：
 
 ```text
-output/
-├── boss_batch/
-├── boss_cleaned/
-├── analysis_v1/
-├── analysis_v1_1/
-└── visualization_v1_1/
+http://127.0.0.1:8765/docs
 ```
 
-最终看板：
+## 浏览器扩展开发
+
+```powershell
+Set-Location .\extension
+npm install
+npm run build
+```
+
+构建结果位于：
 
 ```text
-output/visualization_v1_1/visual_dashboard_v11.html
+extension\.output\chrome-mv3
 ```
 
-该 HTML 已内嵌全部图表，可以作为单文件打开。
+## 构建发布物
 
-## 数据与隐私
+生成 v1.0.7 桌面目录和 ZIP：
 
-真实岗位链接、招聘者信息、浏览器会话、原始页面和分析结果默认不会提交到公开仓库。
+```powershell
+.\build_windows_desktop_shell.ps1 -Version 1.0.7
+```
 
-本项目仅用于个人学习、岗位研究和求职决策。使用时应遵守目标网站的服务条款和访问限制。
+基于相同桌面目录生成安装程序：
 
-## 当前局限
+```powershell
+.\build_windows_installer.ps1 -Version 1.0.7
+```
 
-- 样本来自个人主动收藏，存在明显选择偏差
-- 当前样本量较小，且城市分布不均衡
-- 技能识别和要求性质判断主要基于规则
-- 部分岗位描述仍需要人工复核
-- 当前版本不用于推断整个招聘市场
+安装器 smoke test 会执行真实的当前用户静默安装与卸载，因此需要写入用户级开始菜单和卸载注册表。
 
-## 后续计划
+## 统一验收
 
-- 增加脱敏演示数据
-- 增加自动化测试
-- 将技能词典改为可配置文件
-- 加入个人能力与岗位要求匹配
-- 输出技能缺口和学习优先级
+运行完整基线测试：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass `
+  -File .\run_baseline_tests.ps1 -Version 1.0.7
+```
+
+测试入口依次验证：
+
+1. 核心离线与 UI 契约；
+2. 可移植 Skill 工作流；
+3. 基于数据库副本的本地 API；
+4. 桌面运行模式；
+5. 打包后的 v1.0.7 EXE；
+6. v1.0.7 安装、启动检查、卸载和用户数据保留。
+
+只验证源码和 API、跳过发布物时可以使用：
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass `
+  -File .\run_baseline_tests.ps1 `
+  -Version 1.0.7 -SkipPackaged -SkipInstaller
+```
+
+## Skill 集成
+
+当前可移植 Skill 位于：
+
+```text
+skills\job-market-reality-check
+```
+
+它可以直接分析 CSV、JSON 或 JSONL 文件。计划中的桌面集成型 Skill 必须复用本地 API，不得直接操作 SQLite。
+
+固定的只读接口、字段、鉴权和版本规则见：
+
+```text
+docs\skill-v1-local-api-contract.md
+```
+
+## 当前限制
+
+- 浏览器扩展需要通过开发者模式手动加载固定目录；
+- 安装程序尚未代码签名，Windows 可能显示未知发布者提示；
+- 没有自动升级机制；
+- 未完成大规模 Windows 版本、WebView2 和安全软件兼容矩阵；
+- 市场分析只描述用户收集的岗位样本，不能代表整个招聘市场；
+- 决策分数是透明规则与个人证据的辅助判断，不是录用概率；
+- Skill v1 第一阶段只读，不自动投递、不自动联系招聘者、不批量修改数据。
+
+## 基线冻结
+
+桌面 v1.0.7 的 UI、数据模型和评分引擎在 Skill v1 开发期间冻结。只允许修复阻塞 Skill、数据安全、安装、测试或明确回归的问题。
+
+冻结说明见：
+
+```text
+docs\desktop-v1.0.7-baseline-freeze.md
+```

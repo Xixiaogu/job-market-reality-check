@@ -1,6 +1,6 @@
 ﻿param(
     [string]$ProjectRoot = (Get-Location).Path,
-    [string]$Version = "1.0.0",
+    [string]$Version = "1.0.7",
     [int]$InstallCompilerIfMissing = 1
 )
 
@@ -44,9 +44,10 @@ function Convert-VersionQuad([string]$SemanticVersion) {
 }
 
 $root = (Resolve-Path -LiteralPath $ProjectRoot).Path
-$releaseDir = Join-Path $root ("release\JobMarketDecisionSystem-v" + $Version)
+$releaseDir = Join-Path $root ("release\JobMarketDecisionSystem-v" + $Version + "-desktop")
 $releaseExe = Join-Path $releaseDir "JobMarketDecisionSystem.exe"
 $releaseManifest = Join-Path $releaseDir "browser-extension\chrome-mv3\manifest.json"
+$releaseVersion = Join-Path $releaseDir "version.json"
 $templatePath = Join-Path $root "packaging\installer\JobMarketDecisionSystem.iss.template"
 $testPath = Join-Path $root "test_phase93_installer.py"
 $outputDir = Join-Path $root "release\installer"
@@ -55,10 +56,16 @@ $generatedIss = Join-Path $buildDir "JobMarketDecisionSystem.iss"
 $installerPath = Join-Path $outputDir ("JobMarketDecisionSystem-Setup-v" + $Version + ".exe")
 $hashPath = $installerPath + ".sha256"
 
-foreach ($requiredPath in @($releaseExe, $releaseManifest, $templatePath, $testPath)) {
+foreach ($requiredPath in @($releaseExe, $releaseManifest, $releaseVersion, $templatePath, $testPath)) {
     if (-not (Test-Path -LiteralPath $requiredPath)) {
         Fail "Required Phase 9.2/9.3 file was not found: $requiredPath"
     }
+}
+
+$versionPayload = Get-Content -LiteralPath $releaseVersion -Raw -Encoding UTF8 |
+    ConvertFrom-Json
+if ([string]$versionPayload.version -ne $Version) {
+    Fail "Release version metadata does not match the requested installer version: $($versionPayload.version) != $Version"
 }
 
 $privateFiles = Get-ChildItem -LiteralPath $releaseDir -Recurse -File |
@@ -137,7 +144,7 @@ if (-not (Test-Path -LiteralPath $installerPath)) {
 }
 
 Write-Host "Running installer smoke test..." -ForegroundColor Cyan
-& python $testPath --installer $installerPath
+& python $testPath --installer $installerPath --expected-version $Version
 if ($LASTEXITCODE -ne 0) {
     Fail "Installer smoke test failed."
 }
