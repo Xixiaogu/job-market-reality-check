@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -92,7 +93,11 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/v1/decision/jobs":
             offset = int(query.get("offset", ["0"])[0])
             all_items = [
-                {"job_id": "job-1", "action_group": "apply_now"},
+                {
+                    "job_id": "job-1",
+                    "action_group": "apply_now",
+                    "explanation": "Python • FastAPI",
+                },
                 {"job_id": "job-2", "action_group": "stretch"},
                 {"job_id": "job-3", "action_group": "stretch"},
             ]
@@ -179,6 +184,11 @@ def main() -> None:
                 text=True,
                 encoding="utf-8",
                 errors="replace",
+                env={
+                    **os.environ,
+                    "PYTHONIOENCODING": "gbk",
+                    "PYTHONUTF8": "0",
+                },
                 check=False,
             )
         assert completed.returncode == 0, completed.stdout
