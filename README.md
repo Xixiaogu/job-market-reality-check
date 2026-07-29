@@ -1,229 +1,172 @@
 # Job Market Reality Check
 
-一个本地优先的求职决策桌面系统。它把浏览器岗位采集、本地数据管理、市场分析、个人档案、人工校准、岗位优先级判断和投递状态跟踪连接成完整闭环。
+Local-first Windows desktop software that turns collected job posts and a real candidate profile into explainable application priorities.
 
-当前桌面基线版本为 **v1.0.7**。桌面业务逻辑与评分引擎已冻结，后续主线是在稳定的本地 API 上开发只读 Job Market Skill。
+一个把“岗位采集、市场分析、个人证据、决策排序、投递跟踪”连成闭环的本地求职决策系统。它不是又一个职位收藏夹，也不把评分伪装成录用概率。
 
-## 当前状态
+[![CI](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml/badge.svg)](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml) [![Desktop](https://img.shields.io/badge/Desktop-v1.0.7-2563eb)](https://github.com/Xixiaogu/job-market-reality-check/tree/desktop-v1.0.7-appearance) [![Skill](https://img.shields.io/badge/Agent%20Skill-v0.1.0-7c3aed)](https://github.com/Xixiaogu/job-market-reality-check/tree/skill-v0.1.0) [![Platform](https://img.shields.io/badge/platform-Windows-0078d4)](https://github.com/Xixiaogu/job-market-reality-check) [![License](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
 
-- Windows 桌面程序、ZIP 发布包和浏览器扩展已经可用；
-- FastAPI 只监听 `127.0.0.1`，岗位、档案和决策数据保存在本机 SQLite；
-- 决策中心提供 `apply_now`、`stretch`、`prepare_first`、`defer` 四档行动建议；
-- Windows Acrylic 与标准浅色外观已经产品化；
-- 可移植文件型 Skill 已存在；桌面 API 集成已完成 0.1 只读客户端和 `brief` 上下文闭环；
-- 本项目适合作为求职作品集和本地演示产品，尚不是商业级自动求职软件。
+![Decision Center using the Windows Acrylic appearance and fictional demo data](docs/assets/decision-center-acrylic.png)
 
-## 产品闭环
+_Decision Center in Windows Acrylic mode. Every company, job and profile value shown is fictional._
 
-```text
-招聘网页
-  → 浏览器扩展采集
-  → 本地 FastAPI
-  → SQLite 事实与状态
-  → 市场分析与个人档案
-  → 人工校准
-  → 可解释岗位决策
-  → 投递队列与状态跟踪
+## Why this project
+
+Most job tools stop after saving a posting. This project asks a harder question:
+
+> Given my actual skills, project evidence, availability and constraints, which jobs should I apply to now—and why?
+
+The product keeps evidence and decisions separate. Job facts, candidate facts and manual labels live in local SQLite; the decision engine produces transparent dimensions and four action groups; the read-only Agent Skill explains those results without reimplementing the scoring logic.
+
+## Product loop
+
+```mermaid
+flowchart LR
+    A["User opens a job page"] --> B["Browser extension<br/>user-triggered capture"]
+    B --> C["Local FastAPI<br/>127.0.0.1 only"]
+    C --> D[("SQLite<br/>jobs + profile + state")]
+    D --> E["Market analysis<br/>and calibration"]
+    E --> F["Explainable decision engine"]
+    F --> G["Apply now / Stretch /<br/>Prepare first / Defer"]
+    D --> H["Read-only Agent Skill"]
+    F --> H
+    H --> I["Briefs, comparisons<br/>and action plans"]
 ```
 
-职责边界：
+## What is implemented
 
-| 组件 | 职责 |
+- User-triggered browser capture for supported BOSS job-detail pages, with local deduplication and revision history.
+- Job management for notes, archive state and application progress.
+- Market-sample analysis across salary, city, education, role type and skill requirements.
+- Candidate profile with skills, project evidence, location, schedule and job-direction constraints.
+- Manual calibration on representative jobs.
+- Explainable ranking across match, opportunity value, preparation cost and risk.
+- Four action groups: `apply_now`, `stretch`, `prepare_first` and `defer`.
+- Windows desktop package, portable ZIP and per-user installer.
+- Two productionized appearances: Standard Light and Windows Acrylic. The portfolio demo uses Acrylic.
+- A read-only `job-market-reality-check` Agent Skill with a frozen local API contract.
+
+## Engineering highlights
+
+| Area | Evidence |
 |---|---|
-| 浏览器扩展 | 从招聘页面采集岗位并发送到本机 |
-| FastAPI + SQLite | 保存岗位事实、个人档案、人工状态和决策结果 |
-| 桌面程序 | 统一展示岗位管理、市场分析、档案、校准、决策和设置 |
-| Job Market Skill | 读取事实，生成解释、比较和行动计划；不重复实现数据库与评分引擎 |
+| Architecture | Browser extension + TypeScript/WXT, FastAPI, SQLite, Python decision engine, Windows desktop packaging |
+| Privacy | Localhost-only API, per-install token, local data directory, no telemetry |
+| Reliability | One baseline command covers offline logic, API integration, desktop mode and Skill tests |
+| Reproducibility | CI creates 12 fictional jobs and a fictional candidate profile; no private database is required |
+| Release | Desktop v1.0.7 and Skill v0.1.0 are tagged; ZIP and installer smoke tests are part of the release gate |
+| Agent boundary | The Skill can read only the documented API and cannot modify SQLite or trigger applications |
 
-## 主要能力
+## Quick start
 
-- BOSS 直聘岗位页面采集和本地去重；
-- 岗位列表、详情、归档、备注和投递状态管理；
-- 薪资、城市、学历、招聘类型、技能要求和异常文本清洗；
-- 市场样本统计与可筛选分析看板；
-- 个人技能、项目证据、求职方向和地点约束档案；
-- 代表岗位人工校准；
-- 可解释的岗位匹配、机会价值、准备成本和风险分析；
-- 四档投递优先级和待办队列；
-- 分析自动刷新与决策重算；
-- 标准浅色和 Windows Acrylic 外观；
-- Windows 独立程序、ZIP 发布包和安装程序。
+### Use the Windows desktop release
 
-## 直接使用 Windows 版本
+The v1.0.7 release provides:
 
-### 安装程序
+- [Portable Windows ZIP](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip)
+- [Per-user Windows installer](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe)
+- [ZIP SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip.sha256)
+- [Installer SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe.sha256)
 
-运行：
+The installer is per-user and does not require administrator privileges. It is not code-signed, so Windows may show an unknown-publisher warning. Release assets are published only after the public-readiness checks pass.
 
-```text
-release\installer\JobMarketDecisionSystem-Setup-v1.0.7.exe
-```
+After first launch:
 
-安装程序按当前用户安装，不要求管理员权限。卸载程序不会删除用户数据。
+1. Open **Extensions & Settings**.
+2. Load the bundled `browser-extension/chrome-mv3` folder from `chrome://extensions`.
+3. Open a supported job-detail page and use the extension to capture it.
+4. Complete the candidate profile, then open **Decision Center**.
+5. For the portfolio look, select **Windows Acrylic** and restart the app.
 
-### 免安装 ZIP
+See [the three-minute demo guide](docs/demo-guide.md).
 
-解压：
+### Run from source
 
-```text
-release\JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip
-```
-
-然后双击：
-
-```text
-JobMarketDecisionSystem.exe
-```
-
-首次启动后，在“扩展与设置”中按照提示加载：
-
-```text
-browser-extension\chrome-mv3
-```
-
-## 用户数据与安全
-
-桌面模式的用户数据默认位于：
-
-```text
-%LOCALAPPDATA%\JobMarketDecisionSystem
-├─ data\job_market.db
-├─ runtime\api_token.txt
-├─ logs\app.log
-├─ exports\
-└─ backups\
-```
-
-- 本地服务只监听 `127.0.0.1:8765`；
-- 除健康接口外，API 需要 `X-Job-Market-Token` 请求头；
-- 发布包不包含开发者的数据库、令牌、岗位导出或个人档案；
-- 不要提交或分享 `api_token.txt`；
-- 替换程序目录或升级版本不会覆盖用户数据。
-
-## 开发模式
-
-推荐使用项目环境：
+Requirements: Windows, Python 3.11+, Node.js 22+ and npm.
 
 ```powershell
-conda activate base_science
 python -m pip install -r .\requirements-local-api.txt
-```
 
-启动本地 API 与浏览器界面：
+Set-Location .\extension
+npm ci
+npm run build
+Set-Location ..
 
-```powershell
-.\run_local_api.ps1
-```
-
-启动桌面模式：
-
-```powershell
 python .\desktop_launcher.py
 ```
 
-开发模式 API 文档：
+The development API documentation is available at `http://127.0.0.1:8765/docs` while the service is running.
 
-```text
-http://127.0.0.1:8765/docs
-```
+## Run the complete public CI baseline
 
-## 浏览器扩展开发
+Create a database containing only fictional public-demo data:
 
 ```powershell
-Set-Location .\extension
-npm install
-npm run build
+python .\scripts\create_ci_fixture.py `
+  --output .build\ci-fixture\job_market.db
 ```
 
-构建结果位于：
-
-```text
-extension\.output\chrome-mv3
-```
-
-## 构建发布物
-
-生成 v1.0.7 桌面目录和 ZIP：
+Then run the same core suite used by GitHub Actions:
 
 ```powershell
-.\build_windows_desktop_shell.ps1 -Version 1.0.7
-```
-
-基于相同桌面目录生成安装程序：
-
-```powershell
-.\build_windows_installer.ps1 -Version 1.0.7
-```
-
-安装器 smoke test 会执行真实的当前用户静默安装与卸载，因此需要写入用户级开始菜单和卸载注册表。
-
-## 统一验收
-
-运行完整基线测试：
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass `
-  -File .\run_baseline_tests.ps1 -Version 1.0.7
-```
-
-测试入口依次验证：
-
-1. 核心离线与 UI 契约；
-2. 可移植 Skill 工作流；
-3. 基于数据库副本的本地 API；
-4. 桌面运行模式；
-5. 打包后的 v1.0.7 EXE；
-6. v1.0.7 安装、启动检查、卸载和用户数据保留。
-
-只验证源码和 API、跳过发布物时可以使用：
-
-```powershell
+$python = (Get-Command python.exe).Source
 powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -File .\run_baseline_tests.ps1 `
-  -Version 1.0.7 -SkipPackaged -SkipInstaller
+  -Version 1.0.7 `
+  -PythonPath $python `
+  -SourceDatabasePath .build\ci-fixture\job_market.db `
+  -SkipPackaged `
+  -SkipInstaller
 ```
 
-## Skill 集成
+The current baseline contains 29 checks: offline contracts, Skill workflows, local API integration and desktop-mode behavior. Release maintainers additionally run the packaged EXE and installer smoke tests locally because those artifacts are not built in pull-request CI.
 
-当前可移植 Skill 位于：
+## Use the Agent Skill
 
-```text
-skills\job-market-reality-check
-```
-
-它可以直接分析 CSV、JSON 或 JSONL 文件。计划中的桌面集成型 Skill 必须复用本地 API，不得直接操作 SQLite。
-
-Skill 0.1 可以在桌面服务运行时读取一致的求职简报上下文：
+The distributable Skill is in [`skills/job-market-reality-check`](skills/job-market-reality-check). It can analyze supplied CSV, JSON and JSONL files, or read a running desktop application:
 
 ```powershell
 python .\skills\job-market-reality-check\scripts\local_api_client.py health
 python .\skills\job-market-reality-check\scripts\local_api_client.py brief
 ```
 
-客户端只接受本机地址，只发送 `GET` 请求，并检查分页和决策运行一致性。
+The client accepts only loopback addresses, sends only `GET` requests and verifies pagination plus decision-run consistency. The endpoint, field, authentication and version guarantees are frozen in [the Skill API contract](docs/skill-v1-local-api-contract.md).
 
-固定的只读接口、字段、鉴权和版本规则见：
+## Privacy and collection boundary
+
+- User data stays under `%LOCALAPPDATA%\JobMarketDecisionSystem` in desktop mode.
+- The FastAPI service listens on `127.0.0.1`; protected endpoints require `X-Job-Market-Token`.
+- The browser extension reads the active supported job-detail page only after user action and sends data only to localhost.
+- The repository, tests and CI use fictional `example.invalid` records. Real job databases, exports, tokens, logs and browser profiles are ignored.
+- Users are responsible for complying with the recruitment platform's terms and applicable law. This project does not bypass login, CAPTCHA or access controls.
+- The software does not submit applications, contact recruiters or perform bulk account actions.
+
+Read [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) before using real data.
+
+## Known limitations
+
+- Windows is the supported desktop platform.
+- The browser extension is loaded manually in developer mode.
+- The installer is not code-signed and there is no automatic updater.
+- Windows Acrylic requires a supported Windows 11 build and falls back to Standard Light when unavailable.
+- Market analysis describes only the user's collected sample, not the entire hiring market.
+- Decision scores are transparent heuristics based on recorded evidence, not offer probabilities.
+- Skill v0.1.0 is read-only and intentionally cannot apply, message or edit desktop data.
+
+## Repository map
 
 ```text
-docs\skill-v1-local-api-contract.md
+extension/                         browser collector (TypeScript + WXT)
+local_api/                         FastAPI, SQLite and desktop web UI
+skills/job-market-reality-check/  read-only Agent Skill v0.1.0
+scripts/create_ci_fixture.py       fictional CI/demo dataset generator
+packaging/                         Windows ZIP and installer definitions
+docs/                              architecture, contracts and release notes
+run_baseline_tests.ps1             unified validation entry point
 ```
 
-## 当前限制
+The desktop v1.0.7 business logic and scoring engine are frozen; see [the baseline policy](docs/desktop-v1.0.7-baseline-freeze.md). Contributions should start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
-- 浏览器扩展需要通过开发者模式手动加载固定目录；
-- 安装程序尚未代码签名，Windows 可能显示未知发布者提示；
-- 没有自动升级机制；
-- 未完成大规模 Windows 版本、WebView2 和安全软件兼容矩阵；
-- 市场分析只描述用户收集的岗位样本，不能代表整个招聘市场；
-- 决策分数是透明规则与个人证据的辅助判断，不是录用概率；
-- Skill v1 第一阶段只读，不自动投递、不自动联系招聘者、不批量修改数据。
+## License
 
-## 基线冻结
-
-桌面 v1.0.7 的 UI、数据模型和评分引擎在 Skill v1 开发期间冻结。只允许修复阻塞 Skill、数据安全、安装、测试或明确回归的问题。
-
-冻结说明见：
-
-```text
-docs\desktop-v1.0.7-baseline-freeze.md
-```
+Released under the [MIT License](LICENSE).

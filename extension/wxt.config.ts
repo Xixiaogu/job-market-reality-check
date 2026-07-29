@@ -3,8 +3,8 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   manifest: {
     name: 'Job Market Collector',
-    description: '采集 BOSS 岗位，同步本地 SQLite，并提供首次使用与个人档案冷启动引导。',
-    version: '0.9.0',
+    description: '由用户触发采集 BOSS 岗位，仅同步到本机 Job Market Reality Check。',
+    version: '1.0.7',
     permissions: [
       'activeTab',
       'storage',
