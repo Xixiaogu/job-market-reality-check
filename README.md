@@ -91,40 +91,16 @@ logic.
 
 ## Product workflow
 
-``` mermaid
-flowchart LR
-	subgraph Collect["1 · Collect"]
-		A["BOSS直聘<br/>job-detail page"]
-		B["Browser extension<br/>user-triggered"]
-		A --> B
-	end
-
-	subgraph Local["2 · Analyze locally"]
-		C["FastAPI<br/>localhost only"]
-		D[("SQLite")]
-		E["Evidence model<br/>jobs · profile · calibration"]
-		F["Decision engine<br/>match · value · cost · risk"]
-		C --> D --> E --> F
-	end
-
-	subgraph Act["3 · Decide and act"]
-		G["Windows desktop<br/>review and tracking"]
-		H["Read-only Agent Skill<br/>brief · explain · compare · plan"]
-	end
-
-	B --> C
-	F --> G
-	D -. "read facts" .-> H
-	F -. "read decisions" .-> H
-```
+[View Job Market Reality Check Pipeline](docs/assets/job_market_reality_check_pipeline.pdf)
 
 The ingestion boundary is intentionally narrow in v1.0.7: only manually
 triggered capture from supported BOSS直聘 job-detail pages enters the
 local workflow.
 
-The public demo follows the same boundary: the browser view represents
-real job-page collection, while the desktop view represents local
-analysis and decision-making.
+The public demo follows the same boundary: the browser extension demonstrates
+real BOSS直聘 job-page collection, while the Windows desktop application
+demonstrates local analysis and explainable decision-making based on the
+collected records.
 
 ## What is implemented
 
