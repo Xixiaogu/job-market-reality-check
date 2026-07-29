@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 
@@ -7,12 +8,16 @@ ROOT = Path(__file__).resolve().parent
 MAIN = ROOT / "extension" / "entrypoints" / "popup" / "main.ts"
 STYLE = ROOT / "extension" / "entrypoints" / "popup" / "style.css"
 CONFIG = ROOT / "extension" / "wxt.config.ts"
+PACKAGE = ROOT / "extension" / "package.json"
 
 
 def main() -> None:
     main_text = MAIN.read_text(encoding="utf-8-sig")
     style_text = STYLE.read_text(encoding="utf-8-sig")
     config_text = CONFIG.read_text(encoding="utf-8-sig")
+    package_version = json.loads(
+        PACKAGE.read_text(encoding="utf-8")
+    )["version"]
 
     for fragment in (
         "ProfileOnboardingStatus",
@@ -25,7 +30,7 @@ def main() -> None:
 
     assert "cold-start-panel" in style_text
     assert "PHASE_81C_EXTENSION_COLD_START_STYLE" in style_text
-    assert "version: '0.9.0'" in config_text
+    assert f"version: '{package_version}'" in config_text
 
     print("Phase 8.1C extension static test passed.")
 

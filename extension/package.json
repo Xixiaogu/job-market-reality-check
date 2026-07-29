@@ -1,8 +1,8 @@
 {
-  "name": "wxt-starter",
-  "description": "manifest.json description",
+  "name": "job-market-reality-check-extension",
+  "description": "Local browser collector for Job Market Reality Check",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.7",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -16,6 +16,6 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "wxt": "^0.20.27"
+    "wxt": "^0.21.2"
   }
 }

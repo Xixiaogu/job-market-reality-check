@@ -829,7 +829,7 @@ function extractCompanyFullNameFromBusinessInfo():
       .filter(Boolean);
 
     for (let index = 0; index < lines.length; index += 1) {
-      const line = lines[index];
+      const line = lines[index] ?? '';
 
       if (labels.has(line)) {
         const nextLine = lines[index + 1] ?? '';
@@ -1023,7 +1023,7 @@ function extractCompanyInfo(): {
 
   const industry =
     industryParts.length > 0
-      ? industryParts[0]
+      ? (industryParts[0] ?? null)
       : null;
 
   return {

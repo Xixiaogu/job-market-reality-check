@@ -1,6 +1,7 @@
 param(
     [string]$Version = "1.0.7",
     [string]$PythonPath = "",
+    [string]$SourceDatabasePath = "",
     [switch]$SkipPackaged,
     [switch]$SkipInstaller
 )
@@ -134,9 +135,32 @@ function Stop-IsolatedApi {
     }
 }
 
+function Assert-TestPortAvailable {
+    $client = [Net.Sockets.TcpClient]::new()
+    try {
+        $connection = $client.ConnectAsync("127.0.0.1", 8765)
+        if ($connection.Wait(400) -and $client.Connected) {
+            throw (
+                "Port 8765 is already in use. Close the running desktop or " +
+                "development service before starting the isolated baseline."
+            )
+        }
+    }
+    catch [AggregateException] {
+        return
+    }
+    catch [Net.Sockets.SocketException] {
+        return
+    }
+    finally {
+        $client.Dispose()
+    }
+}
+
 Set-Location -LiteralPath $script:ProjectRoot
 $env:PYTHONUTF8 = "1"
 $script:Python = Resolve-ProjectPython
+Assert-TestPortAvailable
 
 Write-Host "Job Market Reality Check baseline test suite" -ForegroundColor Green
 Write-Host "Python: $script:Python"
@@ -172,9 +196,20 @@ Invoke-PythonTest `
     -Label "skill local API client" `
     -Arguments @("skills\job-market-reality-check\tests\test_local_api_client.py")
 
-$sourceDatabase = Join-Path $script:ProjectRoot "data\job_market.db"
+$sourceDatabase = if ($SourceDatabasePath) {
+    [IO.Path]::GetFullPath(
+        (Join-Path $script:ProjectRoot $SourceDatabasePath)
+    )
+}
+else {
+    Join-Path $script:ProjectRoot "data\job_market.db"
+}
 if (-not (Test-Path -LiteralPath $sourceDatabase)) {
-    throw "The local integration-test source database is missing: $sourceDatabase"
+    throw (
+        "The integration-test source database is missing: $sourceDatabase. " +
+        "Create a synthetic fixture with scripts\create_ci_fixture.py or " +
+        "pass -SourceDatabasePath."
+    )
 }
 
 $testRoot = Join-Path $script:ProjectRoot (
