@@ -1,14 +1,30 @@
 # Job Market Reality Check
 
-Local-first Windows desktop software that turns collected job posts and a real candidate profile into explainable application priorities.
+Local-first Windows desktop software that turns collected job postings and
+user-provided evidence into **explainable application priorities**.
 
-一个把“岗位采集、市场分析、个人证据、决策排序、投递跟踪”连成闭环的本地求职决策系统。它不是又一个职位收藏夹，也不把评分伪装成录用概率。
+不是又一个职位收藏夹，而是帮你回答：**“以我现在的条件，优先投哪些？为什么？”**
 
-[![CI](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml/badge.svg)](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml) [![Desktop](https://img.shields.io/badge/Desktop-v1.0.7-2563eb)](https://github.com/Xixiaogu/job-market-reality-check/tree/desktop-v1.0.7-appearance) [![Skill](https://img.shields.io/badge/Agent%20Skill-v0.1.0-7c3aed)](https://github.com/Xixiaogu/job-market-reality-check/tree/skill-v0.1.0) [![Platform](https://img.shields.io/badge/platform-Windows-0078d4)](https://github.com/Xixiaogu/job-market-reality-check) [![License](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
+[![CI](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml/badge.svg)](https://github.com/Xixiaogu/job-market-reality-check/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Xixiaogu/job-market-reality-check?label=release&color=2563eb)](https://github.com/Xixiaogu/job-market-reality-check/releases/latest) [![Skill](https://img.shields.io/badge/Agent%20Skill-v0.1.0-7c3aed)](https://github.com/Xixiaogu/job-market-reality-check/tree/skill-v0.1.0) [![Platform](https://img.shields.io/badge/platform-Windows-0078d4)](https://github.com/Xixiaogu/job-market-reality-check) [![License](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
+
+## Download v1.0.7
+
+- [Portable Windows ZIP](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip) ([SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip.sha256))
+- [Per-user Windows installer](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe) ([SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe.sha256))
+- [Release notes and all assets](https://github.com/Xixiaogu/job-market-reality-check/releases/tag/v1.0.7)
+
+> **Before installing:** Windows only. The binaries are not code-signed, so
+> Windows may show an unknown-publisher warning. The browser extension is
+> loaded manually in developer mode.
+
+> **Collection scope:** v1.0.7 currently supports user-triggered capture from
+> BOSS直聘 job-detail pages only. Other recruitment sites, list-page crawling
+> and unattended bulk collection are not supported.
 
 ![Decision Center using the Windows Acrylic appearance and fictional demo data](docs/assets/decision-center-acrylic.png)
 
-_Decision Center in Windows Acrylic mode. Every company, job and profile value shown is fictional._
+_Decision Center in Windows Acrylic mode. Every company, job and profile
+value shown is fictional._
 
 ## Why this project
 
@@ -22,7 +38,7 @@ The product keeps evidence and decisions separate. Job facts, candidate facts an
 
 ```mermaid
 flowchart LR
-    A["User opens a job page"] --> B["Browser extension<br/>user-triggered capture"]
+    A["User opens a supported<br/>BOSS job-detail page"] --> B["Browser extension<br/>user-triggered capture"]
     B --> C["Local FastAPI<br/>127.0.0.1 only"]
     C --> D[("SQLite<br/>jobs + profile + state")]
     D --> E["Market analysis<br/>and calibration"]
@@ -35,16 +51,17 @@ flowchart LR
 
 ## What is implemented
 
-- User-triggered browser capture for supported BOSS job-detail pages, with local deduplication and revision history.
-- Job management for notes, archive state and application progress.
-- Market-sample analysis across salary, city, education, role type and skill requirements.
-- Candidate profile with skills, project evidence, location, schedule and job-direction constraints.
-- Manual calibration on representative jobs.
-- Explainable ranking across match, opportunity value, preparation cost and risk.
-- Four action groups: `apply_now`, `stretch`, `prepare_first` and `defer`.
-- Windows desktop package, portable ZIP and per-user installer.
-- Two productionized appearances: Standard Light and Windows Acrylic. The portfolio demo uses Acrylic.
-- A read-only `job-market-reality-check` Agent Skill with a frozen local API contract.
+- User-triggered capture from supported BOSS直聘 job-detail pages, with local
+  deduplication, revision history, notes and application-state tracking.
+- Market-sample analysis across salary, city, education, role type and skill
+  requirements.
+- Candidate evidence profile plus manual calibration on representative jobs.
+- Explainable ranking across match, opportunity value, preparation cost and
+  risk, grouped into `apply_now`, `stretch`, `prepare_first` and `defer`.
+- Windows desktop packaging with Standard Light and Windows Acrylic
+  appearances.
+- A read-only `job-market-reality-check` Agent Skill backed by a frozen local
+  API contract.
 
 ## Engineering highlights
 
@@ -59,22 +76,18 @@ flowchart LR
 
 ## Quick start
 
-### Use the Windows desktop release
+### Install and run
 
-The v1.0.7 release provides:
-
-- [Portable Windows ZIP](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip)
-- [Per-user Windows installer](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe)
-- [ZIP SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-v1.0.7-desktop-windows-x64.zip.sha256)
-- [Installer SHA256](https://github.com/Xixiaogu/job-market-reality-check/releases/download/v1.0.7/JobMarketDecisionSystem-Setup-v1.0.7.exe.sha256)
-
-The installer is per-user and does not require administrator privileges. It is not code-signed, so Windows may show an unknown-publisher warning. Release assets are published only after the public-readiness checks pass.
+Choose the portable ZIP or per-user installer from the
+[download section](#download-v107). The installer does not require
+administrator privileges.
 
 After first launch:
 
 1. Open **Extensions & Settings**.
 2. Load the bundled `browser-extension/chrome-mv3` folder from `chrome://extensions`.
-3. Open a supported job-detail page and use the extension to capture it.
+3. Open a supported BOSS直聘 job-detail page and use the extension to capture
+   it.
 4. Complete the candidate profile, then open **Decision Center**.
 5. For the portfolio look, select **Windows Acrylic** and restart the app.
 
@@ -119,7 +132,11 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -SkipInstaller
 ```
 
-The current baseline contains 29 checks: offline contracts, Skill workflows, local API integration and desktop-mode behavior. Release maintainers additionally run the packaged EXE and installer smoke tests locally because those artifacts are not built in pull-request CI.
+The CI baseline contains 29 test groups across product contracts, offline
+logic, Skill workflows, local API integration and desktop-mode behavior.
+The full 31-group release gate additionally exercises the packaged EXE and
+installer locally because those artifacts are not built in pull-request CI.
+See [the test-suite guide](tests/README.md) for the directory conventions.
 
 ## Use the Agent Skill
 
@@ -136,7 +153,8 @@ The client accepts only loopback addresses, sends only `GET` requests and verifi
 
 - User data stays under `%LOCALAPPDATA%\JobMarketDecisionSystem` in desktop mode.
 - The FastAPI service listens on `127.0.0.1`; protected endpoints require `X-Job-Market-Token`.
-- The browser extension reads the active supported job-detail page only after user action and sends data only to localhost.
+- The browser extension reads the active supported BOSS直聘 job-detail page
+  only after user action and sends data only to localhost.
 - The repository, tests and CI use fictional `example.invalid` records. Real job databases, exports, tokens, logs and browser profiles are ignored.
 - Users are responsible for complying with the recruitment platform's terms and applicable law. This project does not bypass login, CAPTCHA or access controls.
 - The software does not submit applications, contact recruiters or perform bulk account actions.
@@ -146,6 +164,8 @@ Read [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) before using real d
 ## Known limitations
 
 - Windows is the supported desktop platform.
+- BOSS直聘 job-detail pages are the only supported collection source in
+  v1.0.7.
 - The browser extension is loaded manually in developer mode.
 - The installer is not code-signed and there is no automatic updater.
 - Windows Acrylic requires a supported Windows 11 build and falls back to Standard Light when unavailable.
@@ -155,17 +175,25 @@ Read [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) before using real d
 
 ## Repository map
 
+<details>
+<summary>Show the repository layout</summary>
+
 ```text
 extension/                         browser collector (TypeScript + WXT)
 local_api/                         FastAPI, SQLite and desktop web UI
 skills/job-market-reality-check/  read-only Agent Skill v0.1.0
+tests/                             contracts, offline, API and release suites
 scripts/create_ci_fixture.py       fictional CI/demo dataset generator
 packaging/                         Windows ZIP and installer definitions
 docs/                              architecture, contracts and release notes
 run_baseline_tests.ps1             unified validation entry point
 ```
 
-The desktop v1.0.7 business logic and scoring engine are frozen; see [the baseline policy](docs/desktop-v1.0.7-baseline-freeze.md). Contributions should start with [CONTRIBUTING.md](CONTRIBUTING.md).
+</details>
+
+The desktop v1.0.7 business logic and scoring engine are frozen; see
+[the baseline policy](docs/desktop-v1.0.7-baseline-freeze.md). Contributions
+should start with [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 

@@ -13,18 +13,20 @@ The repository remains private until every required item is checked.
 
 - [x] README describes desktop v1.0.7 and Skill v0.1.0 accurately.
 - [x] CI uses only the fictional fixture generator.
-- [ ] Download links point to real release assets.
+- [x] Download links point to the published v1.0.7 release assets.
 - [x] Known limitations include unsigned binaries, manual extension loading and sample bias.
-- [x] Browser collection is described as user-triggered and subject to platform terms.
+- [x] Browser collection is described as BOSS直聘-only, user-triggered and
+  subject to platform terms.
 
 ## Verification
 
 - [x] Extension `npm ci`, type check and build pass.
-- [x] Unified 29-check core baseline passes from fictional data.
+- [x] Unified 29-group core baseline passes from fictional data.
 - [x] Packaged ZIP smoke test passes.
 - [x] Installer install/start/uninstall/data-retention smoke test passes.
 - [x] Skill validation and API-contract tests pass.
-- [ ] GitHub Actions succeeds on the public-readiness pull request.
+- [x] GitHub Actions succeeds on the public-readiness pull request and `main`.
+- [x] Tests are organized by environment and discovered by the unified runner.
 
 ## Repository settings
 
@@ -38,8 +40,8 @@ The repository remains private until every required item is checked.
 
 Only after the checklist passes:
 
-1. merge the public-readiness pull request;
-2. publish the v1.0.7 release assets;
-3. switch repository visibility from private to public;
+1. merge the public-polish pull request;
+2. complete the repository description, topics and branch protection;
+3. let the repository owner switch visibility from private to public;
 4. open the public README in a signed-out browser;
 5. verify the CI badge and every release link.

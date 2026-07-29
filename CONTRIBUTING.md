@@ -45,6 +45,8 @@ $python = (Get-Command python.exe).Source
 ```
 
 The fixture generator refuses to overwrite an existing database and uses fictional `example.invalid` URLs.
+See [the test-suite guide](tests/README.md) for categories and naming
+conventions.
 
 ## Pull requests
 

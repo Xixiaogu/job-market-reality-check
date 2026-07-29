@@ -30,9 +30,9 @@ $requiredFiles = @(
     "packaging\generate_branding.py",
     "packaging\branding\app_icon.ico",
     "packaging\branding\app_icon.png",
-    "test_desktop_shell.py",
-    "test_phase91_offline.py",
-    "test_phase92_release.py",
+    "tests\contracts\test_desktop_shell.py",
+    "tests\contracts\test_desktop_productization.py",
+    "tests\release\test_portable_package_smoke.py",
     "packaging\README_FIRST.txt",
     "packaging\浏览器扩展安装说明.txt",
     "packaging\数据与隐私说明.txt",
@@ -78,7 +78,7 @@ Write-Host "Running source syntax checks..." -ForegroundColor Cyan
 & python -m py_compile `
     (Join-Path $root "desktop_app.py") `
     (Join-Path $root "desktop_launcher.py") `
-    (Join-Path $root "test_desktop_shell.py")
+    (Join-Path $root "tests\contracts\test_desktop_shell.py")
 if ($LASTEXITCODE -ne 0) {
     Fail "Python syntax check failed."
 }
@@ -86,14 +86,14 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Running desktop-shell source tests..." -ForegroundColor Cyan
 Push-Location $root
 try {
-    & python .\test_desktop_shell.py
+    & python -m tests.contracts.test_desktop_shell
     if ($LASTEXITCODE -ne 0) {
         Fail "Desktop-shell source tests failed."
     }
 
-    & python .\test_phase91_offline.py
+    & python -m tests.contracts.test_desktop_productization
     if ($LASTEXITCODE -ne 0) {
-        Fail "Phase 9.1 regression test failed."
+        Fail "Desktop productization contract tests failed."
     }
 }
 finally {
@@ -239,7 +239,8 @@ if ($forbidden) {
 Write-Host "Running packaged headless smoke test..." -ForegroundColor Cyan
 Push-Location $root
 try {
-    & python .\test_phase92_release.py --release-dir $releaseDir
+    & python -m tests.release.test_portable_package_smoke `
+        --release-dir $releaseDir
     if ($LASTEXITCODE -ne 0) {
         Fail "Packaged release smoke test failed."
     }

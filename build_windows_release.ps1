@@ -23,7 +23,7 @@ $requiredFiles = @(
     "local_api\pipeline.py",
     "job_market_decision_system.spec",
     "packaging\windows_version_info.txt",
-    "test_phase92_release.py",
+    "tests\release\test_portable_package_smoke.py",
     "packaging\README_FIRST.txt",
     "packaging\浏览器扩展安装说明.txt",
     "packaging\数据与隐私说明.txt",
@@ -67,17 +67,17 @@ Write-Host "Running source syntax checks..." -ForegroundColor Cyan
 & python -m py_compile `
     (Join-Path $root "desktop_launcher.py") `
     (Join-Path $root "local_api\pipeline.py") `
-    (Join-Path $root "test_phase92_release.py")
+    (Join-Path $root "tests\release\test_portable_package_smoke.py")
 if ($LASTEXITCODE -ne 0) {
     Fail "Python syntax check failed."
 }
 
-Write-Host "Running Phase 9.1 offline regression test..." -ForegroundColor Cyan
+Write-Host "Running desktop productization contract tests..." -ForegroundColor Cyan
 Push-Location $root
 try {
-    & python .\test_phase91_offline.py
+    & python -m tests.contracts.test_desktop_productization
     if ($LASTEXITCODE -ne 0) {
-        Fail "Phase 9.1 regression test failed."
+        Fail "Desktop productization contract tests failed."
     }
 }
 finally {
@@ -178,7 +178,8 @@ if ($forbidden) {
 Write-Host "Running packaged release smoke test..." -ForegroundColor Cyan
 Push-Location $root
 try {
-    & python .\test_phase92_release.py --release-dir $releaseDir
+    & python -m tests.release.test_portable_package_smoke `
+        --release-dir $releaseDir
     if ($LASTEXITCODE -ne 0) {
         Fail "Packaged release smoke test failed."
     }

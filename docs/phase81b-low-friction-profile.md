@@ -39,11 +39,11 @@
 离线测试：
 
 ```powershell
-python .\test_phase81b_offline.py
+python -m tests.offline.test_profile_preferences
 ```
 
 启动 API 后在线测试：
 
 ```powershell
-python .\test_phase81b_api.py
+python -m tests.api.development.test_profile_preferences_api
 ```
