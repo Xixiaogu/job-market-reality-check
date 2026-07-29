@@ -21,10 +21,12 @@ user-provided evidence into **explainable application priorities**.
 > BOSS直聘 job-detail pages only. Other recruitment sites, list-page crawling
 > and unattended bulk collection are not supported.
 
-![Decision Center using the Windows Acrylic appearance and fictional demo data](docs/assets/decision-center-acrylic.png)
+![End-to-end BOSS capture, local sync and Windows Acrylic decision workflow](docs/assets/workflow-demo-acrylic.gif)
 
-_Decision Center in Windows Acrylic mode. Every company, job and profile
-value shown is fictional._
+_End-to-end workflow: a sanitized BOSS job-detail page is captured by the
+browser extension, written to local SQLite, and reflected in the Windows
+Acrylic Decision Center. All displayed account, company, job and candidate
+text is fictionalized._
 
 ## Why this project
 
