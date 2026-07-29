@@ -67,13 +67,6 @@ records.
 ![Windows Acrylic decision center
 demo](docs/assets/workflow-demo-acrylic.gif)
 
-### Browser extension capture
-
-The browser extension captures supported BOSS直聘 job-detail pages after
-a user-triggered action and sends the extracted job information to the
-local FastAPI service.
-
-![BOSS直聘 capture demo](docs/assets/boss-capture-demo.gif)
 
 ## Why this project
 
