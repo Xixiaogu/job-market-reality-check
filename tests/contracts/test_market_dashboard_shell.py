@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 
-from dashboard_management_link_v13 import (
+from pipeline.dashboard_compat import (
     END_MARKER,
     START_MARKER,
     enhance_management_link,

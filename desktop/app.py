@@ -15,7 +15,7 @@ import webbrowser
 from pathlib import Path
 from typing import Any
 
-import desktop_launcher as legacy
+from desktop import runtime as legacy
 
 
 PRODUCT_TITLE = "招聘市场分析与投递决策系统"
@@ -289,7 +289,7 @@ class DesktopShell:
                 logging.debug("Could not set native window icon", exc_info=True)
 
         try:
-            from windows_glass import apply_windows_glass
+            from desktop.windows_effects import apply_windows_glass
 
             self.glass_result = apply_windows_glass(
                 self.window.native,
@@ -578,7 +578,7 @@ def run_desktop_shell() -> int:
 
         ensure_runtime_directories()
         token = get_or_create_token()
-        from windows_glass import (
+        from desktop.windows_effects import (
             configure_webview_environment,
             requested_material,
             requested_mode,

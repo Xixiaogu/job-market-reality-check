@@ -9,7 +9,7 @@
 ### 开发模式
 
 ```powershell
-.\run_local_api.ps1
+.\scripts\run_api.ps1
 ```
 
 继续使用仓库内的 `data/`、`local_api/runtime/` 和 `output/`，便于调试。
@@ -17,7 +17,7 @@
 ### 桌面模式
 
 ```powershell
-python .\desktop_launcher.py
+python -m desktop.app
 ```
 
 使用：

@@ -103,7 +103,7 @@ def appearance_status() -> dict[str, Any]:
     windows_build = 0
     supported = os.name == "nt"
     try:
-        from windows_glass import windows_build_number
+        from desktop.windows_effects import windows_build_number
 
         windows_build = windows_build_number()
         supported = os.name == "nt" and windows_build >= 22621

@@ -91,7 +91,7 @@ def test_management_ui_markers() -> None:
 
 
 def test_dashboard_auto_refresh_markers() -> None:
-    text = (ROOT / "dashboard_ux_v12.py").read_text(
+    text = (ROOT / "pipeline" / "dashboard_enhancer.py").read_text(
         encoding="utf-8-sig",
     )
     required = (

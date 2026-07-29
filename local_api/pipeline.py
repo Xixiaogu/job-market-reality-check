@@ -13,7 +13,7 @@ from .config import (
     DASHBOARD_PATH,
     PIPELINE_LOG_DIR,
     IS_FROZEN,
-    PIPELINE_SCRIPTS,
+    PIPELINE_STEPS,
     PROJECT_ROOT,
     USER_DATA_ROOT,
     WORK_ROOT,
@@ -86,19 +86,31 @@ def run_pipeline_sync(run_id: int | None = None) -> dict[str, Any]:
 
         environment = os.environ.copy()
         environment["PYTHONUTF8"] = "1"
+        existing_python_path = environment.get("PYTHONPATH")
+        environment["PYTHONPATH"] = (
+            str(PROJECT_ROOT)
+            + (
+                os.pathsep + existing_python_path
+                if existing_python_path
+                else ""
+            )
+        )
         completed_steps = 0
 
-        for index, script_name in enumerate(
-            PIPELINE_SCRIPTS,
+        for index, module_name in enumerate(
+            PIPELINE_STEPS,
             start=1,
         ):
-            script_path = PROJECT_ROOT / script_name
-            if not script_path.exists():
+            module_path = (
+                PROJECT_ROOT
+                / Path(*module_name.split("."))
+            ).with_suffix(".py")
+            if not IS_FROZEN and not module_path.exists():
                 raise FileNotFoundError(
-                    f"缺少分析脚本：{script_path}"
+                    f"缺少分析模块：{module_path}"
                 )
 
-            current_step = f"{index}/{len(PIPELINE_SCRIPTS)} {script_name}"
+            current_step = f"{index}/{len(PIPELINE_STEPS)} {module_name}"
             update_pipeline_run(
                 run_id,
                 current_step=current_step,
@@ -113,14 +125,14 @@ def run_pipeline_sync(run_id: int | None = None) -> dict[str, Any]:
             command = (
                 [
                     sys.executable,
-                    "--run-script",
-                    script_name,
+                    "--run-step",
+                    module_name,
                     "--no-migrate",
                     "--user-data-dir",
                     str(USER_DATA_ROOT),
                 ]
                 if IS_FROZEN
-                else [sys.executable, str(script_path)]
+                else [sys.executable, "-m", module_name]
             )
             result = subprocess.run(
                 command,
@@ -143,7 +155,7 @@ def run_pipeline_sync(run_id: int | None = None) -> dict[str, Any]:
 
             if result.returncode != 0:
                 raise RuntimeError(
-                    f"{script_name} 失败，退出码：{result.returncode}"
+                    f"{module_name} 失败，退出码：{result.returncode}"
                 )
 
             completed_steps = index
@@ -162,7 +174,7 @@ def run_pipeline_sync(run_id: int | None = None) -> dict[str, Any]:
             status="success",
             finished_at=utc_now(),
             current_step="完成",
-            completed_steps=len(PIPELINE_SCRIPTS),
+            completed_steps=len(PIPELINE_STEPS),
             return_code=0,
             dashboard_path=str(DASHBOARD_PATH),
         )

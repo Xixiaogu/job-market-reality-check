@@ -1,5 +1,5 @@
-from dashboard_ux_v12 import enhance_dashboard
-from dashboard_management_link_v13 import enhance_management_link
+from pipeline.dashboard_compat import enhance_management_link
+from pipeline.dashboard_enhancer import enhance_dashboard
 
 import base64
 import html

@@ -35,9 +35,9 @@
 
 `local_api/app_shell.py` 在 `/dashboard` 页面加载完成后，将看板原有
 `#ux-sidebar` 移入 `#jm-app-main` 内部的双栏布局。市场分析看板仍由现有
-`dashboard_ux_v12.py` 生成，因此图表和交互逻辑不需要重写。
+`pipeline/dashboard_enhancer.py` 生成，因此图表和交互逻辑不需要重写。
 
-`dashboard_management_link_v13.py` 保留兼容调用，但只清除旧浮动链接，
+`pipeline/dashboard_compat.py` 保留兼容调用，但只清除旧浮动链接，
 不再生成第二套应用级导航入口。
 
 ## 手动验收

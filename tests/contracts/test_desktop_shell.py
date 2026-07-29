@@ -3,7 +3,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-import desktop_app
+from desktop import app as desktop_app
 
 
 def main() -> None:
@@ -30,7 +30,7 @@ def main() -> None:
     assert "window.events.closing" in source
     assert "desktop-shell.lock" in source
 
-    root = Path(desktop_app.__file__).resolve().parent
+    root = Path(desktop_app.__file__).resolve().parents[1]
     icon_png = root / "packaging" / "branding" / "app_icon.png"
     icon_ico = root / "packaging" / "branding" / "app_icon.ico"
     assert icon_png.exists(), icon_png

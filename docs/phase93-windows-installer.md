@@ -36,8 +36,8 @@ release\JobMarketDecisionSystem-v1.0.7-desktop
 构建脚本会同时核对 `version.json`，避免把旧桌面目录封装进新版本安装器：
 
 ```powershell
-conda activate base_science
-.\build_windows_installer.ps1 -Version 1.0.7
+python -m pip install -e ".[desktop,build]"
+.\scripts\build\build_installer.ps1 -Version 1.0.7
 ```
 
 smoke test 会执行真实的当前用户静默安装，因此需要写入开始菜单和

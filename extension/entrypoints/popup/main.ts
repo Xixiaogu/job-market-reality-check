@@ -1521,7 +1521,7 @@ function renderApiOffline(message: string): void {
   setApiBadge('offline', '服务离线');
   apiSummaryElement.textContent = message;
   pipelineStatusElement.textContent =
-    '分析状态：请先启动 run_local_api.ps1';
+    '分析状态：请先启动 scripts/run_api.ps1';
   syncAllButton.disabled = true;
   openDashboardButton.disabled = true;
   profileOnboarding = null;

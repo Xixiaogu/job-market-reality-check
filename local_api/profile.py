@@ -1122,12 +1122,12 @@ def _literal_skill_defs_from_script(path: Path) -> list[tuple[str, str, list[str
             result.append((name, group, patterns))
         if result:
             return result
-    raise ValueError("未能从 audit_boss_skills.py 读取 SKILL_DEFS。")
+    raise ValueError("未能从 pipeline/audit_skills.py 读取 SKILL_DEFS。")
 
 
 @lru_cache(maxsize=1)
 def load_skill_definitions() -> tuple[tuple[str, str, tuple[str, ...]], ...]:
-    script_path = PROJECT_ROOT / "audit_boss_skills.py"
+    script_path = PROJECT_ROOT / "pipeline" / "audit_skills.py"
     try:
         definitions = _literal_skill_defs_from_script(script_path)
     except (OSError, SyntaxError, ValueError):

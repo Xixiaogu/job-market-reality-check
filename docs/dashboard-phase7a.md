@@ -17,7 +17,7 @@ This phase upgrades the generated single-file dashboard without changing the sta
 
 ## Pipeline integration
 
-`visualize_boss_jobs_v11.py` calls `enhance_dashboard()` immediately after writing the original HTML. Future API-triggered pipeline runs therefore regenerate the enhanced dashboard automatically.
+`pipeline/build_dashboard.py` calls `enhance_dashboard()` immediately after writing the original HTML. Future API-triggered pipeline runs therefore regenerate the enhanced dashboard automatically.
 
 ## Runtime behavior
 

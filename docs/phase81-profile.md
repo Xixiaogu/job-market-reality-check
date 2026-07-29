@@ -26,7 +26,7 @@ Phase 8.1 为后续可解释投递优先级提供用户侧数据，不进行岗�
 
 ## 动态技能建议
 
-系统会读取现有 `audit_boss_skills.py` 中的 `SKILL_DEFS`，但不会导入 pandas 或运行完整分析管线。它通过 AST 安全读取技能定义，然后在 SQLite 当前有效、未归档且未排除的岗位语料中统计技能覆盖。
+系统会读取 `pipeline/audit_skills.py` 中的 `SKILL_DEFS`，但不会导入 pandas 或运行完整分析管线。它通过 AST 安全读取技能定义，然后在 SQLite 当前有效、未归档且未排除的岗位语料中统计技能覆盖。
 
 技能建议不是白名单。用户可以直接添加 `LangGraph`、`因果推断` 或其他任意新技能。
 

@@ -12,20 +12,7 @@ project_root = Path(
     os.environ.get("JOB_MARKET_BUILD_ROOT", Path.cwd())
 ).resolve()
 
-pipeline_scripts = (
-    "clean_boss_jobs.py",
-    "analyze_boss_jobs.py",
-    "audit_boss_skills.py",
-    "visualize_boss_jobs_v11.py",
-)
-
 datas = []
-for script_name in pipeline_scripts:
-    script_path = project_root / script_name
-    if not script_path.exists():
-        raise FileNotFoundError(f"Required pipeline script not found: {script_path}")
-    datas.append((str(script_path), "."))
-
 branding_dir = project_root / "packaging" / "branding"
 for asset_name in ("app_icon.png", "app_icon.ico"):
     asset_path = branding_dir / asset_name
@@ -36,14 +23,12 @@ for asset_name in ("app_icon.png", "app_icon.ico"):
 hiddenimports = sorted(
     set(
         collect_submodules("local_api")
+        + collect_submodules("desktop")
+        + collect_submodules("pipeline")
         + collect_submodules("uvicorn")
         + collect_submodules("webview")
         + collect_submodules("pystray")
         + [
-            "clean_boss_jobs",
-            "analyze_boss_jobs",
-            "audit_boss_skills",
-            "visualize_boss_jobs_v11",
             "anyio._backends._asyncio",
             "PIL.Image",
             "PIL.ImageDraw",
@@ -56,7 +41,7 @@ hiddenimports = sorted(
 )
 
 a = Analysis(
-    [str(project_root / "desktop_app.py")],
+    [str(project_root / "desktop" / "app.py")],
     pathex=[str(project_root)],
     binaries=[],
     datas=datas,
